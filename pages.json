@@ -8,19 +8,37 @@
 		}, {
 			"path": "pages/book/book",
 			"style": {
-				"navigationBarTitleText": "炎餐厅 · 时间预定"
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/seat-map/seat-map",
 			"style": {
-				"navigationBarTitleText": "炎餐厅 · 座位预定"
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
 			}
 		},
 		{
 			"path": "pages/myorders/myorders",
 			"style": {
-				"navigationBarTitleText": "我的预订"
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/manage/manage",
+			"style": {
+				"navigationBarTitleText": ""
 			}
 		}
 	],

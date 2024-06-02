@@ -2,37 +2,44 @@
 		<view :class="rootClass">
 			<view class="date-box">
 				<view class="box-list" :style="{'margin-bottom' : list.length > 0 ? '20rpx' : '0'}">
-					<view class="date-top">
-						<view class="icon left-icon" @click="LastYear">
+					<view class="date-top frs-center">
+						<view>请预约就餐日期</view>
+						<view class="">
+							<!-- <view class="icon left-icon" @click="LastYear">
 							<view class="iconfont icon-jiantou_xiangzuoliangci"></view>
-						</view>
-						<view class="conter-text">
-							<view class="icon left-icon" @click="LastMonth">
-								<view class="iconfont icon-xiangzuo1"></view>
+						</view> -->
+							<view class="conter-text">
+								<view class="icon left-icon" @click="LastMonth">
+									<view class="iconfont icon-xiangzuo1"></view>
+								</view>
+								<text class="month">{{month}}月</text>
+								<view class="icon rigth-icon" @click="NextMonth">
+									<view class="iconfont icon-xiangyou1"></view>
+								</view>
 							</view>
-							<text class="month">{{year}}年{{month}}月</text>
-							<view class="icon rigth-icon" @click="NextMonth">
-								<view class="iconfont icon-xiangyou1"></view>
-							</view>
-						</view>
-						<view class="icon rigth-icon" @click="NextYear">
+							<!-- <view class="icon rigth-icon" @click="NextYear">
 							<view class="iconfont icon-jiantou_xiangyouliangci"></view>
+						</view> -->
 						</view>
 					</view>
-					<view class="date-week">
-						<view class="week-item" v-for="item in weekList" :key="item"><text>周{{item}}</text></view>
-					</view>
-					<view class="day-content" :style="{height: isOpen ? '100rpx' : 'auto'}" v-if="dayList.length > 0">
-						<view class="day-item day-month" v-if="!isOpen"><text>{{month < 10 ? `0${month}` : month}}</text>
+					<view class="date-center">
+						<view class="day-item day-month">
+							<image class="back-image"
+								src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yan_background2.png" />
 						</view>
-						<view class="day-item" v-for="(item, index) in dayList" :key="index" :data-index="index"
-							@click="toActive(item, index)">
-							<text class="day-text" v-if="item.day"
-								:class="{ 'actives' : item.day === day }">{{item.day ? item.day : ''}}</text>
-							<!-- <text class="value-text" v-if="item.data.status">{{item.data.value}}</text> -->
-							<text class="value-text text-gold">{{item.data.value}}</text>
-							<text class="day-dot" v-if="item.data.dot && item.data.active"></text>
-							<text class="day-dot dot-gray" v-if="item.data.dot && !item.data.active"></text>
+						<view class="date-week">
+							<view class="week-item" v-for="item in weekList" :key="item"><text>周{{item}}</text></view>
+						</view>
+						<view class="day-content" :style="{height: isOpen ? '100rpx' : 'auto'}" v-if="dayList.length > 0">
+							<!-- 	<view class="day-item day-month" v-if="!isOpen"><text>{{month < 10 ? `0${month}` : month}}</text>
+						  </view> -->
+							<view class="day-item" v-for="(item, index) in dayList" :key="index" :data-index="index"
+								@click="toActive(item, index)">
+								<text class="day-text" v-if="item.day"
+									:class="{ 'actives' : item.day === day }">{{item.day ? item.day : ''}}</text>
+								<text
+									:class="{'value-text':true, 'text-gold': item.data.value, 'text-gray':item.data.value}">{{item.data.value}}</text>
+							</view>
 						</view>
 					</view>
 					<view style="width: 100%;" v-if="isShrink">
@@ -44,13 +51,16 @@
 						</view>
 					</view>
 				</view>
-				<slot name="task">
-					<view class="task-box" v-if="list.length > 0">
-						<view v-for="(item, index) in list" :key="index"
-							:class="item.isChosen?'task-item task-item-chosen':'task-item'" @click="toTask(item, index)">
-							<view class="time"><text>{{item.time}}</text></view>
-							<view class="seatsLeft"><text class="branch">剩余:
-									{{item.seatsLeft}}个座位</text></view>
+				<slot name="period">
+					<view class="period-box-wrap" v-if="list.length > 0">
+						<view class="period-description">请选择就餐时间段</view>
+						<view class="period-box">
+							<view v-for="(item, index) in list" :key="index" class="period-item" @click="toPeriod(item, index)">
+								<view class="time"><text>{{item.time===0?'17:30~18:30':'19:00 ~20:00'}}</text></view>
+								<view v-if="item.isChosen" class="time-chosen frc-center">
+									<image style="width: 24rpx;height: 16rpx;" src="/static/book/right.svg"></image>
+								</view>
+							</view>
 						</view>
 					</view>
 				</slot>
@@ -116,16 +126,14 @@
 						return [{
 							date: '2024-5-7',
 							value: '4',
-							status: true,
-							dot: true,
-							active: false
+							desk0: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+							desk1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
 						}, {
 							date: '2024-5-8',
 							value: '24',
-							status: false,
-							dot: true,
-							active: true
-						}] // {date: '2020-6-3', value: '签到', dot: true, active: true}
+							desk0: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+							desk1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+						}]
 					}
 				},
 
@@ -203,6 +211,11 @@
 			},
 			onLoad() {
 
+			},
+			watch: {
+				extraData: function(val, oldVal) {
+					this.initApi(this.year, this.month)
+				},
 			},
 			created() {
 				this.isOpen = this.isUnfold
@@ -336,24 +349,36 @@
 				},
 
 				toActive(item, index) {
+					// 当日已经订满
+					if (!item.data.value || item.data.value === 0) {
+						console.log("当日已经订满或不可预订");
+						return
+					}
 					this.day = item.day
 					this.$emit('click-active', {
 						year: this.year,
 						month: this.month,
 						day: item.day,
 						date: this.year + '-' + this.month + '-' + this.day,
+						desk0: item.data.desk0,
+						desk1: item.data.desk1,
 						index: index
 					})
 				},
 
-				toTask(item, index) {
-					this.$emit('click-task', {
+				toPeriod(item, index) {
+					this.$emit('click-period', {
 						row: item,
 						index: index
 					})
 				},
 
 				LastMonth() {
+					// 不可点击本月之前的月份
+					const currentMonth = new Date().getMonth() + 1
+					if (currentMonth === this.month) {
+						return
+					}
 					if (this.month > 1) {
 						this.month = this.month - 1
 						this.initApi(this.year, this.month)
@@ -364,7 +389,8 @@
 					}
 					this.$emit('last-month', {
 						year: this.year,
-						month: this.month
+						month: this.month,
+						day: this.day
 					})
 				},
 
@@ -378,7 +404,8 @@
 					this.initApi(this.year, this.month)
 					this.$emit('next-month', {
 						year: this.year,
-						month: this.month
+						month: this.month,
+						day: this.day
 					})
 				},
 
@@ -439,16 +466,23 @@
 					display: flex;
 					justify-content: space-between;
 					align-items: center;
-					padding: 40rpx 20rpx;
+					padding: 20rpx 32rpx;
+					background-color: #22262D;
+					border-top-right-radius: 16rpx;
+					border-top-left-radius: 16rpx;
+					font-size: 28rpx;
 
 					.icon {
-						width: 50rpx;
-						height: 50rpx;
-						line-height: 50rpx;
+						width: 40rpx;
+						height: 40rpx;
+						line-height: 40rpx;
+						display: flex;
+						align-items: center;
+						justify-content: center;
 
 						image {
-							width: 50rpx;
-							height: 50rpx;
+							width: 40rpx;
+							height: 40rpx;
 						}
 					}
 
@@ -462,85 +496,32 @@
 
 						.month {
 							padding: 0 40rpx;
+							font-size: 28rpx;
 						}
 					}
 				}
 
-				.date-week {
-					display: flex;
-					align-items: center;
-					justify-content: space-between;
-					flex: 1;
-					padding: 20rpx;
-					border-bottom: 1rpx solid #918133;
-
-					.week-item {
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						width: calc(100%/7);
-						height: 52rpx;
-						text-align: center;
-						font-size: 30rpx;
-						color: #8e8e8e;
-					}
-				}
-
-				.day-content {
-					display: flex;
-					flex-direction: row;
-					flex-wrap: wrap;
-					align-items: center;
-					padding: 10rpx 20rpx;
+				.date-center {
 					position: relative;
 
-					.day-item {
+					.date-week {
 						display: flex;
-						flex-direction: column;
-						// justify-content: center;
 						align-items: center;
-						width: calc(100%/7);
-						height: 95rpx;
-						text-align: center;
-						font-size: 32rpx;
+						justify-content: space-between;
+						flex: 1;
+						padding: 20rpx;
 						z-index: 2;
-						position: relative;
 
-						.day-text {
-							width: 65rpx;
-							height: 65rpx;
-							line-height: 65rpx;
-
-							// margin-bottom: 5rpx;
-							&.actives {
-								color: #fff;
-								box-sizing: border-box;
-								background-color: #918133;
-								border-radius: 6rpx;
-								border-radius: 50%;
-							}
-						}
-
-						.value-text {
-							font-size: 24rpx;
+						.week-item {
+							z-index: 2;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							width: calc(100%/7);
+							height: 52rpx;
+							text-align: center;
+							font-size: 28rpx;
 							color: #8e8e8e;
-
-							&.text-gold {
-								color: #8D6329;
-							}
-						}
-
-						.day-dot {
-							margin-top: 5rpx;
-							background: #dd6161;
-							border-radius: 50%;
-							padding: 6rpx;
-							position: absolute;
-							bottom: 36rpx;
-
-							&.dot-gray {
-								background: #18b566;
-							}
 						}
 					}
 
@@ -560,10 +541,69 @@
 						font-size: 200px;
 						font-weight: 700;
 						color: #8e8e8e;
-						opacity: .1;
 						text-align: center;
 						line-height: 1;
-						z-index: 1;
+					}
+
+					.back-image {
+						position: absolute;
+						z-index: 0;
+						bottom: 0;
+						left: 0;
+						width: 100%;
+						height: 100%;
+					}
+				}
+
+				.day-content {
+					display: flex;
+					flex-direction: row;
+					flex-wrap: wrap;
+					align-items: center;
+					padding: 10rpx 20rpx;
+					position: relative;
+
+					.day-item {
+						display: flex;
+						flex-direction: column;
+						// justify-content: center;
+						align-items: center;
+						width: calc(100%/7);
+						height: 120rpx;
+						text-align: center;
+						font-size: 28rpx;
+						z-index: 2;
+						position: relative;
+
+						.day-text {
+							width: 56rpx;
+							height: 56rpx;
+							line-height: 56rpx;
+
+							// margin-bottom: 5rpx;
+							&.actives {
+								color: black;
+								box-sizing: border-box;
+								background-color: #F06627;
+								border-radius: 6rpx;
+								border-radius: 50%;
+							}
+						}
+
+						.value-text {
+							font-size: 22rpx;
+							color: #8e8e8e;
+
+							&.text-gold {
+								color: #F06627;
+								font-size: 22rpx;
+							}
+
+							.text-gray {
+								color: #ccc;
+								font-size: 22rpx;
+							}
+						}
 					}
 				}
 
@@ -598,40 +638,56 @@
 				}
 			}
 
-			.task-box {
+			.period-box-wrap {
 				display: flex;
 				flex-direction: column;
 
-				.task-item {
+				.period-box {
+					display: flex;
+					flex-direction: row;
+					gap: 16rpx;
+				}
+
+				.period-description {
+					padding: 24rpx 32rpx;
+					background-color: #22262D;
+					color: #8e8e8e;
+					border-top-right-radius: 16rpx;
+					border-top-left-radius: 16rpx;
+					font-size: 28rpx;
+					margin-bottom: 16rpx;
+				}
+
+				.period-item {
+					flex: 1;
 					display: flex;
 					flex-direction: row;
 					align-items: center;
-					justify-content: space-between;
+					justify-content: center;
 					background-color: transparent;
 					padding: 20rpx;
 					box-sizing: border-box;
-					border-radius: 10rpx;
-					border: 1px solid #423A38;
-					margin-bottom: 20rpx;
+					border-radius: 16rpx;
+					background-color: #22262D;
+					color: #8e8e8e;
+					position: relative;
+					cursor: pointer;
 
 					.time {
-						font-size: 30rpx;
+						font-size: 24rpx;
 						color: #8e8e8e;
-						margin-bottom: 15rpx;
 					}
 
-					.seatsLeft {
-						font-size: 26rpx;
-						color: #8e8e8e;
-
-						.branch {
-							margin-right: 15rpx;
-						}
+					.time-chosen {
+						position: absolute;
+						width: 48rpx;
+						height: 40rpx;
+						right: 0px;
+						bottom: 0px;
+						background: #F06627;
+						border-top-left-radius: 16rpx;
+						border-bottom-right-radius: 16rpx;
 					}
-				}
-
-				.task-item-chosen {
-					background-color: #907f695e;
 				}
 			}
 		}

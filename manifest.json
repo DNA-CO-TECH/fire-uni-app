@@ -1,5 +1,5 @@
 {
-    "name" : "樊聪的个人简历",
+    "name" : "炎 薪火",
     "appid" : "__UNI__EFAD288",
     "description" : "",
     "versionName" : "1.0.0",
@@ -17,7 +17,9 @@
             "delay" : 0
         },
         /* 模块配置 */
-        "modules" : {},
+        "modules" : {
+            "Share" : {}
+        },
         /* 应用发布信息 */
         "distribute" : {
             /* android打包配置 */
@@ -43,7 +45,14 @@
             /* ios打包配置 */
             "ios" : {},
             /* SDK配置 */
-            "sdkConfigs" : {}
+            "sdkConfigs" : {
+                "share" : {
+                    "weixin" : {
+                        "appid" : "wx174b9687f77508f6",
+                        "UniversalLinks" : ""
+                    }
+                }
+            }
         }
     },
     /* 快应用特有相关 */
@@ -55,12 +64,12 @@
     },
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wxc49fd9fb40d7b106",
+        "appid" : "wx174b9687f77508f6",
         "setting" : {
             "urlCheck" : false,
-            "postcss" : true,
-            "minified" : true,
-            "es6" : true
+            "postcss" : false,
+            "minified" : false,
+            "es6" : false
         },
         "usingComponents" : true,
         "uniStatistics" : {

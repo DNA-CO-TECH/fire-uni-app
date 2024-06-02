@@ -1,107 +1,95 @@
 <template>
-	<view class="root">
-		<view class="seat-container">
-			<image class="back-image" src="/static/book/seatBack.png" />
-			<view class="container">
+	<view class="root flex flex-col">
+		<view class="nav-wrap"
+			:style="`height:${navBarHeight}px; background: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yan_background1.png'); background-size: 100% ${navBarHeight}px;`">
+			<!-- 胶囊区域 -->
+			<view class="capsule-box"
+				:style="`height:${menuHeight}px; min-height:${menuHeight}px; line-height:${menuHeight}px; bottom:${menuBottom}px;`">
+				<image class="nav-logo" src="/static/book/left-arrow.png" @click="handleBack"></image>
+				<view class="nav-title" style="flex:1; text-align: center">选择餐桌位置</view>
+			</view>
+		</view>
+		<view class="book-container fcc-start">
+			<view class="container z-1 flex-1">
 				<view class="restaurant">
 					<view class="left">
 						<!-- 第 1 个桌子 -->
 						<view class="table1-wrap">
 							<view class="flex seat-row">
-								<view :class="{ 'seat': true,
-					 			                'seat-top': true,
-					 											'seat-topleft': true,
-					 			                'booked': isBooked[0][0] === 1,
-					 			                'not-booked': isBooked[0][0] !== 1 }">
-									<icon v-if="isBooked[0][0]===1" class="icon-small" type="success_no_circle" size="18" color="black">
-									</icon>
-								</view>
-								<view :class="{ 'seat': true,
-					 			                'seat-top': true,
-					 											'seat-topright': true,
-					 			                'booked': isBooked[0][1] === 1,
-					 			                'not-booked': isBooked[0][1] !== 1 }">
-									<icon v-if="isBooked[0][1]===1" class="icon-small" type="success_no_circle" size="18" color="black">
-									</icon>
+								<view v-for="seatIndex in [1,2]" :key="seatIndex" @click="toggleBookSeats(0,seatIndex)" :class="{ 
+									'seat': true,
+									'seat-top': true,
+									'select-booked': myBookSeatsIds.includes(seatIndex),
+									'booked': tableStatus[0] === 0,
+									'not-booked':  tableStatus[0] !== 0 }">
 								</view>
 							</view>
-							<view class="table" />
+							<view :class="{ 
+								'table': true,
+								'booked': tableStatus[0] === 0,
+								'not-booked': tableStatus[0] !== 0 }">
+								{{tableStatus[0] === 0?'不可预定':"点击预订"}}
+							</view>
 							<view class="flex seat-row">
-								<view :class="{ 'seat': true,
-					 			                'seat-bottom': true,
-					 											'seat-bottomleft': true,
-					 			                'booked': isBooked[0][2] === 1,
-					 			                'not-booked': isBooked[0][2] !== 1 }">
-									<icon v-if="isBooked[0][2]===1" class="icon-small" type="success_no_circle" size="18" color="black">
-									</icon>
-								</view>
-								<view :class="{ 'seat': true,
-					 			                'seat-bottom': true,
-					 											'seat-bottomright': true,
-					 			                'booked': isBooked[0][3] === 1,
-					 			                'not-booked': isBooked[0][3] !== 1 }">
-									<icon v-if="isBooked[0][3]===1" class="icon-small" type="success_no_circle" size="18" color="black">
-									</icon>
+								<view v-for="seatIndex in [3,4]" :key="seatIndex" @click="toggleBookSeats(0,seatIndex)" :class="{ 
+										'seat': true,
+										'seat-bottom': true,
+										'select-booked': myBookSeatsIds.includes(seatIndex),
+										'booked': tableStatus[0] === 0,
+										'not-booked':   tableStatus[0] !== 0 }">
 								</view>
 							</view>
 						</view>
 						<!-- 第 2 个桌子 -->
 						<view class="table2-wrap">
 							<view class="fcc-between gap-12">
-								<view v-for="item in isBooked[1]" :key="item" :class="{ 'seat': true,
-							                'seat-left': true,
-							                'booked': item === 1,
-							                'not-booked': item !== 1 }">
-									<icon v-if="item===1" class="icon-small" type="success_no_circle" size="18" color="black"></icon>
+								<view v-for="seatIndex in [5,6,7]" :key="seatIndex" @click="toggleBookSeats(1,seatIndex)" :class="{ 
+									'seat': true,
+									'seat-left': true,
+									'select-booked': myBookSeatsIds.includes(seatIndex),
+									'booked':  tableStatus[1] === 0,
+									'not-booked': tableStatus[1] !== 0 }">
 								</view>
 							</view>
-							<view class="table2" />
+							<view :class="{ 'table2': true,
+								'booked':  tableStatus[1] === 0,
+								'not-booked': tableStatus[1] !== 0 }">
+								{{ tableStatus[1] === 0 ? '不可预定':"点击预订"}}
+							</view>
 							<view class="fcc-center gap-12">
-								<view v-for="item in isBooked[2]" :key="item" :class="{ 'seat': true,
-							                'seat-right': true,
-							                'booked': item === 1,
-							                'not-booked': item !== 1 }">
-									<icon v-if="item===1" class="icon-small" type="success_no_circle" size="18" color="black"></icon>
+								<view v-for="seatIndex in [8,9,10]" :key="seatIndex" @click="toggleBookSeats(1,seatIndex)" :class="{
+									'seat': true,
+									'seat-right': true,
+									'select-booked': myBookSeatsIds.includes(seatIndex),
+									'booked':  tableStatus[1] === 0,
+									'not-booked':  tableStatus[1] !== 0 }">
 								</view>
 							</view>
 						</view>
 						<!-- 第 3 个桌子 -->
 						<view class="table3-wrap">
 							<view class="flex seat-row">
-								<view :class="{ 'seat': true,
-							                'seat-top': true,
-															'seat-topleft': true,
-							                'booked': isBooked[2][0] === 1,
-							                'not-booked': isBooked[2][0] !== 1 }">
-									<icon v-if="isBooked[2][0]===1" class="icon-small" type="success_no_circle" size="18" color="black">
-									</icon>
-								</view>
-								<view :class="{ 'seat': true,
-							                'seat-top': true,
-															'seat-topright': true,
-							                'booked': isBooked[2][0] === 1,
-							                'not-booked': isBooked[2][0] !== 1 }">
-									<icon v-if="isBooked[2][1]===1" class="icon-small" type="success_no_circle" size="18" color="black">
-									</icon>
+								<view v-for="seatIndex in [11,12]" :key="seatIndex" @click="toggleBookSeats(2,seatIndex)" :class="{
+										'seat': true,
+										'seat-top': true,
+										'select-booked': myBookSeatsIds.includes(seatIndex),
+										'booked': !myBookTableIds.includes(2) && tableStatus[2] === 0,
+										'not-booked': !myBookTableIds.includes(2) &&tableStatus[2] !== 0 }">
 								</view>
 							</view>
-							<view class="table" />
+							<view :class="{ 
+									'table': true,
+									'booked': !myBookTableIds.includes(2) && tableStatus[2] === 0,
+									'not-booked': !myBookTableIds.includes(2) && tableStatus[2] !== 0 }">
+								{{tableStatus[2] === 0?'不可预定':"点击预订"}}
+							</view>
 							<view class="flex seat-row">
-								<view :class="{ 'seat': true,
-							                'seat-bottom': true,
-															'seat-bottomleft': true,
-							                'booked': isBooked[2][2] === 1,
-							                'not-booked': isBooked[2][2] !== 1 }">
-									<icon v-if="isBooked[2][2]===1" class="icon-small" type="success_no_circle" size="18" color="black">
-									</icon>
-								</view>
-								<view :class="{ 'seat': true,
-							                'seat-bottom': true,
-															'seat-bottomright': true,
-							                'booked': isBooked[2][3] === 1,
-							                'not-booked': isBooked[2][3] !== 1 }">
-									<icon v-if="isBooked[2][3]===1" class="icon-small" type="success_no_circle" size="18" color="black">
-									</icon>
+								<view v-for="seatIndex in [13,14]" :key="seatIndex" @click="toggleBookSeats(2,seatIndex)" :class="{ 
+										'seat': true,
+										'seat-bottom': true,
+										'select-booked': myBookSeatsIds.includes(seatIndex),
+										'booked': !myBookTableIds.includes(2) && tableStatus[2] === 0,
+										'not-booked': !myBookTableIds.includes(2) && tableStatus[2] !== 0 }">
 								</view>
 							</view>
 						</view>
@@ -110,414 +98,448 @@
 						<!-- 吧台 -->
 						<view class="bar-wrap">
 							<view class="fcc-between" :style="{padding:'20px 0px'}">
-								<view class="fcc-between flex-1">
-									<view v-for="item in isBooked[3]" :key="item" :class="{ 'seat': true,
-								                'seat-left': true,
-								                'booked': item === 1,
-								                'not-booked': item !== 1 }">
-										<icon v-if="item===1" class="icon-small" type="success_no_circle" size="18" color="black">
-										</icon>
-									</view>
-								</view>
-								<view class="fcc-center" style="color:#515452;height: 80px;">——</view>
-								<view class="fcc-between flex-1">
-									<view v-for="item in isBooked[4]" :key="item" :class="{ 'seat': true,
-								                'seat-left': true,
-								                'booked': item === 1,
-								                'not-booked': item !== 1 }">
-										<icon v-if="item===1" class="icon-small" type="success_no_circle" size="18" color="black">
-										</icon>
-									</view>
+								<view @click="toggleBookSeats(tableIndex)" v-for="tableIndex in [3,4,5,6,7,8,9,10]" :key="tableIndex"
+									:class="{ 'seat': true,
+														'seat-left': true,
+														'select-booked': myBookTableIds.includes(tableIndex),
+														'booked':!myBookTableIds.includes(tableIndex) &&tableStatus[tableIndex]===0,
+														'not-booked':!myBookTableIds.includes(tableIndex) && tableStatus[tableIndex]!== 0 }">
 								</view>
 							</view>
-							<view class="bar fcc-center">
-								<text style="width: 22px;" class="fcc-center">明厨餐吧</text>
+							<view class="bar-back fcs-between relative">
+								<view class="bar">
+									<text style="width: 22px;border:none" :class="{ 
+										'fcc-center': true, 
+										'booked': tableStatus.some(table=>table===0),
+										'not-booked': tableStatus.some(table=>table===1) }">开放式吧台</text>
+								</view>
 							</view>
 						</view>
-						<!-- 大门 -->
-						<view class="door-wrap">
-							<view class="quadrant quadrant-top-left"></view>
-						</view>
+						<view class="bar-tip">* 请点击座位进行预订</view>
+					</view>
+					<view class="light-mask">
+						<view class="light"></view>
 					</view>
 				</view>
 			</view>
-			<button class="next-step" @click="showConfirmPanel">立即预定</button>
-			<view class="modal" v-if="isShowConfirmPanel">
-				<view class="mask" />
-				<view class="z-content">
-					<view class="modal-content">
-						<view class="z-modal">
-							<view class="modal-title">
-								<slot name="title">
-									<image src="/static/book/yan-black.png" alt="logo" class="w-32 h-32" />
-									<view class="title-description mt-20">
-										<text>感谢您预定炎·薪火</text>
-									</view>
-									<view class="title-description">
-										<text>非常荣幸与您确认以下信息</text>
-									</view>
-								</slot>
-							</view>
-							<view class="fcc-center mt-10">————————</view>
-							<view class="z-modal-content">
-								<slot name="content">
-									<view>
-										<text class="content-title"> 预约信息</text>
-									</view>
-									<view class="mb-20">
-										<text> 4月17日 17:30~18:30，两位就餐</text>
-									</view>
-									<view>
-										<text class="content-title">取消政策</text>
-									</view>
-									<view class="mb-20">
-										<text>超过预订时间段30分钟未到场，将自动取消</text>
-									</view>
-									<view>
-										<text class="content-title">餐厅地址</text>
-									</view>
-									<view>
-										<text> 浙江省安吉县溪龙乡树下小白屋</text>
-									</view>
-									<view class="confirm mt-32" @click="confirm">
-										<text>确认预订</text>
-									</view>
-								</slot>
-							</view>
-						</view>
-					</view>
-					<view class="modal-foot">
-						<slot name="footer">
-							<view class="cancel cursor-pointer" @click="closeConfirmPanel">
-								<image src="/static/book/cancel.png" class="w-20 h-20 mt-20" />
-							</view>
-						</slot>
-					</view>
-				</view>
+			<view class="frc-center" style="height: 172rpx">
+				<input :class="{'phone':true,'phone-empty':phoneNumberEmpty}" name="input" placeholder="请输入预约人手机号"
+					@input="onKeyInput" />
+				<button class="next-step" @click="confirm">立即预定</button>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	import {
+		postOrderInfo
+	} from "../../api/order.js"
+	import {
+		getStorage
+	} from "../../utils/storage.js"
+	import {
+		mapMutations,
+		mapState
+	} from 'vuex'
 	export default {
+		onLoad(options) {
+			// #ifdef MP-WEIXIN
+			uni.setBackgroundColor({
+				backgroundColor: "#000000"
+			})
+			// #endif
+			const res = getStorage('menuInfo')
+			console.log("menuInfo-res", res);
+			this.navBarHeight = res?.navBarHeight + 20 || 80
+			this.menuHeight = res?.menuHeight || 32
+			this.menuBottom = res?.menuBottom || 7
+			this.tableStatus = this.getTableBookArray()
+		},
 		data() {
 			return {
-				isBooked: [
-					[1, 0, 0, 0], // 第一个桌子
-					[0, 1, 0, 0], // 第二个桌子左边
-					[0, 0, 1, 0], // 第二个桌子右边
-					[0, 0, 0, 0], // 第三个桌子
-					[0, 1, 0, 0], // 吧台上面
-					[0, 0, 0, 0] // 吧台下面
-				],
-				isDeskOneBooked: false,
-				isDeskTwoBooked: false,
-				isDeskThreeBooked: false,
-				isDeskFourBooked: false,
-				isShowConfirmPanel: false
+				navBarHeight: 80,
+				menuHeight: 32,
+				menuBottom: 7,
+				tableStatus: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 0代表已经被预订，1代表可以预定
+				myBookTableIds: [],
+				myBookSeatsIds: [],
+				phoneNumberEmpty: false,
+				phoneNumber: null
 			}
 		},
+		computed: {
+			...mapState({
+				bookInfo: state => state.bookInfo,
+				desksLeft: state => state.desksLeft,
+			})
+		},
 		methods: {
-			confirm() {
-				console.log('发送确认订单，成功后跳转到我的订单页面')
-				this.closeConfirmPanel()
+			onKeyInput: function(event) {
+				this.phoneNumber = event.detail.value;
+				this.phoneNumberEmpty = false
+			},
+			async confirm() {
+				if (this.myBookTableIds.length === 0) {
+					uni.showModal({
+						title: "提交失败",
+						content: "请至少预定一个座位"
+					})
+				} else if (!this.phoneNumber) {
+					console.log("this.phoneNumber", this.phoneNumber);
+					this.phoneNumberEmpty = true
+				} else {
+					const response = await postOrderInfo({
+						"desk": this.myBookTableIds.map(id => id + 1),
+						"people": this.myBookSeatsIds.length, // 预订人数
+						"phoneNumber": this.phoneNumber,
+						...this.bookInfo,
+					});
+					if (response) {
+						uni.navigateTo({
+							url: '/pages/myorders/myorders'
+						})
+					}
+				}
+			},
+			handleBack() {
 				uni.navigateTo({
-					url: '/pages/myorders/myorders'
+					url: '/pages/book/book'
 				})
 			},
-			showConfirmPanel() {
-				this.isShowConfirmPanel = true
+			getTableBookArray(val) {
+				const tableBookArray = new Array(11).fill(0); // 0代表已经被预订，不可预订了，1代表可以预定
+				for (const deskNumber of this.desksLeft) {
+					tableBookArray[deskNumber - 1] = 1;
+				}
+				return tableBookArray;
 			},
-			closeConfirmPanel() {
-				this.isShowConfirmPanel = false
+			toggleBookSeats(tableIndex, seatIndex) {
+				if (this.tableStatus?.[tableIndex] === 0) {
+					return false
+				}
+				const tableIndexSet = new Set(this.myBookTableIds) // 桌子index从0开始
+				const seatsIndexSet = new Set(this.myBookSeatsIds) // 椅子index从1开始
+				// 当参数只有桌子，就是吧台的处理逻辑
+				if (!seatIndex) {
+					tableIndexSet.has(tableIndex) ? tableIndexSet.delete(tableIndex) : tableIndexSet.add(tableIndex)
+					this.myBookTableIds = Array.from(tableIndexSet)
+				}
+				// 当参数有桌子和椅子
+				else if (seatIndex) {
+					// 已经点过这个椅子则取消椅子的选取，
+					if (seatsIndexSet.has(seatIndex)) {
+						seatsIndexSet.delete(seatIndex)
+						// console.log("tableIndex", tableIndex)
+						// console.log("seatsIndexSet", seatsIndexSet)
+						switch (tableIndex) {
+							case 0:
+								// 0号桌子1，2，3，4座位都没有被订，才能取消桌子的选取
+								if (!(seatsIndexSet.has(1) || seatsIndexSet.has(2) ||
+										seatsIndexSet.has(3) || seatsIndexSet.has(4))) {
+									tableIndexSet.delete(0)
+									this.myBookTableIds = Array.from(tableIndexSet)
+								}
+							case 1:
+								// 1号桌子5，6，7，8，9，10座位都没有被订，才能取消桌子的选取
+								if (!(seatsIndexSet.has(5) || seatsIndexSet.has(6) || seatsIndexSet.has(7) ||
+										seatsIndexSet.has(8) || seatsIndexSet.has(9) || seatsIndexSet.has(10))) {
+									tableIndexSet.delete(1)
+									this.myBookTableIds = Array.from(tableIndexSet)
+								}
+							case 2:
+								// 2号桌子11，12，13，14座位都没有被订，才能取消桌子的选取
+								if (!(seatsIndexSet.has(11) || seatsIndexSet.has(12) ||
+										seatsIndexSet.has(13) || seatsIndexSet.has(14))) {
+									tableIndexSet.delete(2)
+									this.myBookTableIds = Array.from(tableIndexSet)
+								}
+							default:
+								console.log("取消了选择")
+						}
+					} else {
+						// 没有点过这个椅子则选择椅子, 桌子如果没选就选一下
+						seatsIndexSet.add(seatIndex)
+						if (!tableIndexSet.has(tableIndex)) {
+							tableIndexSet.add(tableIndex)
+							this.myBookTableIds = Array.from(tableIndexSet)
+						}
+					}
+					this.myBookSeatsIds = Array.from(seatsIndexSet)
+				}
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.seat-container {
+	.capsule-box {
 		display: flex;
-		flex-direction: column;
-		position: relative;
-		height: calc(100% - 20rpx);
-		padding: 0rpx 10rpx 20rpx 10rpx;
+		padding: 48rpx;
 	}
 
-	.seat-container .back-image {
+	.nav-wrap {
 		position: absolute;
-		z-index: 0;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-	}
-
-	.next-step {
-		width: calc(100% - 1.25rem);
-		height: 100rpx;
-		padding: 0.625rem;
-		background-color: #907F69;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.container {
-		height: 100%;
-		width: 100%;
-		overflow-y: auto;
-		overflow-x: hidden;
-		background-color: rgb(0, 0, 0);
-	}
-
-	.restaurant {
-		width: 100%;
-		height: 100%;
-		position: relative;
-		display: flex;
-	}
-
-	.restaurant .left,
-	.restaurant .right {
-		position: relative;
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		justify-content: start;
-	}
-
-	.restaurant .left {
-		gap: 40rpx;
-	}
-
-	.bar-wrap {
-		display: flex;
-		justify-content: flex-end;
-		margin-right: 80rpx;
-	}
-
-	.seat-row {
-		width: 150rpx;
-		justify-content: space-between;
-	}
-
-	.table1-wrap,
-	.table3-wrap {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.table {
-		border: 4rpx solid #3a3432;
-		width: 140rpx;
-		height: 90rpx;
-		margin: 6rpx auto;
-	}
-
-	.table2 {
-		width: 88rpx;
-		height: 300rpx;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		border: 4rpx solid #3a3432;
-		margin-left: 6rpx;
-		margin-right: 6rpx;
-	}
-
-	.table2-wrap {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: center;
-		margin-top: 20px;
-		margin-bottom: 20px;
-	}
-
-	.seat {
-		width: 56rpx;
-		height: 56rpx;
-		border: 2rpx solid #3a3432;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.bar {
-		border: 2rpx solid #3a3432;
-		height: 840rpx;
-		width: 88rpx;
-		margin-left: 6rpx;
-	}
-
-	.bar text {
-		color: #907f6c;
-	}
-
-	.booked {
-		background-color: #ddc2a5;
-		color: #181818;
-	}
-
-	.not-booked {
-		background-color: #907f6c44;
-		color: #907f6c;
-	}
-
-	.seat-left {
-		border-top-left-radius: 50%;
-		border-bottom-left-radius: 50%;
-	}
-
-	.seat-right {
-		border-top-right-radius: 50%;
-		border-bottom-right-radius: 50%;
-	}
-
-	.seat-top {
-		border-top-left-radius: 50%;
-		border-top-right-radius: 50%;
-	}
-
-	.seat-bottom {
-		border-bottom-left-radius: 50%;
-		border-bottom-right-radius: 50%;
-	}
-
-	.door-wrap {
-		position: absolute;
-		bottom: 20rpx;
-		right: 0px;
-		width: 160rpx;
-		height: 160rpx;
-		overflow: hidden;
-		border-right: 2rpx solid #3a3432;
-		border-bottom: 2rpx solid #3a3432;
-	}
-
-	.quadrant {
-		width: 300rpx;
-		height: 300rpx;
-		border: 4rpx solid #3a3432;
-	}
-
-	.quadrant-top-left {
-		border-radius: 50% 0 0 50%;
-	}
-
-	.quadrant-top-left {
 		top: 0;
 		left: 0;
+		width: 100%;
+		height: 160rpx;
+		z-index: 1;
 	}
 
-	.modal {
+	.nav-wrap .nav-logo {
+		width: 36rpx;
+		height: 34rpx;
+		margin-top: 8rpx;
+		cursor: pointer;
+	}
+
+	.nav-title {
+		color: #F06627;
+	}
+
+	.book-container {
+		margin-top: 160rpx;
+		height: calc(100% - 160rpx);
+	}
+
+	.book-container {
 		display: flex;
 		flex-direction: column;
-		flex: 1;
+		position: relative;
+		height: 100%;
+		padding: 0rpx 10rpx 20rpx 10rpx;
 
-		.mask {
-			transition-duration: 450ms;
-			transition-timing-function: ease-out;
-			position: fixed;
-			inset: 0px;
-			z-index: 10070;
-			background-color: rgba(0, 0, 0, 0.8);
+		.back-image {
+			position: absolute;
+			z-index: 0;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
 		}
 
-		.z-content {
-			z-index: 10075;
-			position: fixed;
+		.phone {
+			color: #C8CACE;
+			height: 70rpx;
+			border-right: none;
+			border-left: 1px solid;
+			border-top: 1px solid;
+			border-bottom: 1px solid;
+			border-color: #423A38;
+			border-top-left-radius: 12rpx;
+			border-bottom-left-radius: 12rpx;
+			padding-left: 24rpx;
+			font-size: 28rpx;
+		}
+
+		.phone-empty {
+			border-color: #EE692C;
+		}
+
+		.next-step {
+			width: 200rpx;
+			height: 70rpx;
+			color: white;
+			background-color: #EE692C;
+			font-size: 28rpx;
 			display: flex;
 			align-items: center;
 			justify-content: center;
+		}
+
+		.container {
+			height: 100%;
+			width: calc(100% - 60rpx);
+			margin: 0 30rpx;
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		.restaurant {
+			width: 100%;
+			height: 100%;
+			position: relative;
+			display: flex;
+		}
+
+		.restaurant .left,
+		.restaurant .right {
+			position: relative;
+			flex: 1;
+			display: flex;
 			flex-direction: column;
-			inset: 0px;
+			justify-content: center;
+			z-index: 2;
+		}
 
-			.modal-content {
-				border-radius: 12rpx;
-				overflow: hidden;
-				margin-top: 0px;
-				background-color: #907F69;
-				position: relative;
+		.restaurant .left {
+			gap: 40rpx;
+		}
 
-				.z-modal {
-					width: 560rpx;
-					border-radius: 12rpx;
-					overflow: hidden;
+		.bar-wrap {
+			display: flex;
+			justify-content: flex-end;
+			width: 320rpx;
+		}
 
-					.modal-title {
-						font-size: 32rpx;
-						font-weight: 700;
-						color: #131415;
-						text-align: center;
-						padding-top: 50rpx;
-					}
+		.seat-row {
+			width: 150rpx;
+			justify-content: space-between;
+		}
 
-					.title-description {
-						color: #3C3830;
-						font-weight: 400;
-					}
+		.table1-wrap,
+		.table3-wrap {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
 
-					.content-title {
-						font-size: 32rpx;
-						font-weight: 700;
-						color: #131415;
-						text-align: center;
-						margin-bottom: 12rpx;
-						display: block;
-					}
+		.table {
+			font-size: 24rpx;
+			border: 4rpx solid;
+			letter-spacing: 2px;
+			width: 140rpx;
+			height: 90rpx;
+			margin: 6rpx auto;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
 
-					.z-modal-content {
-						padding: 24rpx 50rpx 50rpx 50rpx;
-						display: flex;
-						flex-direction: column;
-						align-items: center;
-						justify-content: center;
-						font-size: 14px;
-						color: #3C3830;
-					}
+		.table2 {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			writing-mode: tb;
+			letter-spacing: 4px;
+			font-size: 24rpx;
+			width: 88rpx;
+			height: 300rpx;
+			border: 4rpx solid;
+			margin-left: 6rpx;
+			margin-right: 6rpx;
+		}
 
-					.confirm {
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						height: 96rpx;
-						width: 100%;
-						cursor: pointer;
+		.table2 text {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 
-						text {
-							color: #131415;
-							border: 2rpx solid #131415;
-							padding: 20rpx;
-							text-align: center;
-							width: 100%;
-						}
-					}
-				}
+		.table2-wrap {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			margin-top: 20px;
+			margin-bottom: 20px;
+		}
 
-				.modal-foot {
-					display: flex;
-					flex-direction: row;
-					font-size: 16px;
-					text-align: center;
-					color: rgb(96, 98, 102);
+		.seat {
+			width: 56rpx;
+			height: 56rpx;
+			border: 2rpx solid;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 
-					.cancel {
-						flex: 1;
-						display: flex;
-						flex-direction: row;
-						justify-content: center;
-						align-items: center;
-						height: 48px;
-					}
-				}
+		.bar-back {
+			background-image: url(/static/book/bar.svg);
+			background-repeat: no-repeat;
+			width: 224rpx;
+			height: 896rpx;
+			margin-left: 6rpx;
+			background-size: 100% 100%;
+		}
 
-			}
+		.bar-tip {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			color: #907f6c;
+			font-size: 24rpx;
+		}
+
+		.light-mask {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			bottom: 0px;
+			right: 0px;
+			z-index: 1;
+			background: linear-gradient(0deg, #131415 0.88%, rgba(19, 20, 21, 0.001) 100%);
+			border-radius: 20rpx;
+		}
+
+		.light {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			bottom: 0px;
+			right: 0px;
+			z-index: -1;
+			background-image: url(/static/book/light.png);
+			background-repeat: no-repeat;
+			background-size: cover;
+			backdrop-filter: blur(70px);
+			opacity: 0.6;
+		}
+
+		.bar {
+			height: 840rpx;
+			width: 126rpx;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.bar text {
+			color: #907f6c;
+			font-size: 24rpx;
+		}
+
+		.booked {
+			color: #9D8B86;
+			border: 2px solid #423A38;
+		}
+
+		.not-booked {
+			color: #9D8B86;
+			border: 2px solid #4D2615;
+		}
+
+		.select-booked {
+			color: #F06627;
+			border: 2px solid #F06627;
+		}
+
+		.seat-left {
+			border-top-left-radius: 50%;
+			border-bottom-left-radius: 50%;
+			border-right: 0px;
+		}
+
+		.seat-right {
+			border-top-right-radius: 50%;
+			border-bottom-right-radius: 50%;
+			border-left: 0px;
+		}
+
+		.seat-top {
+			border-top-left-radius: 50%;
+			border-top-right-radius: 50%;
+			border-bottom: 0px;
+		}
+
+		.seat-bottom {
+			border-bottom-left-radius: 50%;
+			border-bottom-right-radius: 50%;
+			border-top: 0px;
 		}
 	}
 </style>

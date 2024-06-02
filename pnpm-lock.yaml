@@ -1,0 +1,22 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      uni-ajax:
+        specifier: ^2.5.1
+        version: 2.5.1
+
+packages:
+
+  uni-ajax@2.5.1:
+    resolution: {integrity: sha512-xmJY/yl5eRAb0b2qujTS1XNYhkSRWGL4PwkYqQrLpH2BMa2v/2zCJtqcTVUmqn4qQtdP3vLoFL86vaH3ABYAZA==}
+
+snapshots:
+
+  uni-ajax@2.5.1: {}
