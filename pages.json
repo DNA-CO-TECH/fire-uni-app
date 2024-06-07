@@ -26,7 +26,8 @@
 			"style": {
 				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
-				"navigationStyle": "custom"
+				"navigationStyle": "custom",
+				"enableShareAppMessage": true
 			}
 		},
 		{
@@ -38,7 +39,15 @@
 		{
 			"path": "pages/manage/manage",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/editOrder/editOrder",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
 			}
 		}
 	],
@@ -46,7 +55,9 @@
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "炎餐厅",
 		"navigationBarBackgroundColor": "#000000",
-		"backgroundColor": "#000000"
+		"backgroundColor": "#000000",
+		"animationType": "slide-in-bottom",
+		"animationDuration": 300
 	},
 	"uniIdRouter": {}
 }

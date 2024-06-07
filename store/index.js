@@ -4,7 +4,7 @@ import {
 const store = createStore({
 	state: {
 		bookInfo: {}, // 当前预订的信息，要传给给后台
-		desksLeft: [] // 从后台拿到的预定日期对应时间的桌子编号数组，用于前端初始化seat-map页面
+		desksLeft: [] // 从后台拿到的预订日期对应时间的桌子编号数组，用于前端初始化seat-map页面
 	},
 	mutations: {
 		setBookInfo(state, bookInfo) {

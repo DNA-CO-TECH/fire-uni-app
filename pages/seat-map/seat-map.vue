@@ -1,17 +1,23 @@
 <template>
 	<view class="root flex flex-col">
-		<view class="nav-wrap"
-			:style="`height:${navBarHeight}px; background: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yan_background1.png'); background-size: 100% ${navBarHeight}px;`">
+		<view class="nav-wrap" :style="{
+			    height: `${navHeight}px`,
+			    background: isEdit ? '#FFFFFF' : `url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yan_background1.png')`,
+			    backgroundSize: '100% ' + navHeight + 'px'
+			  }">
 			<!-- 胶囊区域 -->
 			<view class="capsule-box"
-				:style="`height:${menuHeight}px; min-height:${menuHeight}px; line-height:${menuHeight}px; bottom:${menuBottom}px;`">
-				<image class="nav-logo" src="/static/book/left-arrow.png" @click="handleBack"></image>
-				<view class="nav-title" style="flex:1; text-align: center">选择餐桌位置</view>
+				:style="`height:${navigationBarHeight}px; min-height:${navigationBarHeight}px; line-height:${navigationBarHeight}px; margin-top:${statusBarHeight}px;`">
+				<image class="nav-logo" :src="`${isEdit?'/static/manage/left-arrow.svg':'/static/book/left-arrow.png'}`"
+					@click="handleBack"></image>
+				<view class="nav-title" :style="{'flex':1, 'text-align': 'center', color: isEdit?'#131415':''}">
+					{{isEdit?'修改':'选择'}}餐桌位置
+				</view>
 			</view>
 		</view>
-		<view class="book-container fcc-start">
-			<view class="container z-1 flex-1">
-				<view class="restaurant">
+		<view class="book-container fcc-start" :style="{backgroundColor: isEdit?'#FFFFFF':'#131415'}">
+			<view class="container z-1 flex-1 mt-12">
+				<view :class="`${isEdit?'restaurant isEdit':'restaurant'}`">
 					<view class="left">
 						<!-- 第 1 个桌子 -->
 						<view class="table1-wrap">
@@ -22,13 +28,14 @@
 									'select-booked': myBookSeatsIds.includes(seatIndex),
 									'booked': tableStatus[0] === 0,
 									'not-booked':  tableStatus[0] !== 0 }">
+									{{isEdit && myBookSeatsIds.includes(seatIndex) ?"✔":""}}
 								</view>
 							</view>
 							<view :class="{ 
 								'table': true,
 								'booked': tableStatus[0] === 0,
 								'not-booked': tableStatus[0] !== 0 }">
-								{{tableStatus[0] === 0?'不可预定':"点击预订"}}
+								{{tableStatus[0] === 0?'不可预订':"点击预订"}}
 							</view>
 							<view class="flex seat-row">
 								<view v-for="seatIndex in [3,4]" :key="seatIndex" @click="toggleBookSeats(0,seatIndex)" :class="{ 
@@ -37,6 +44,7 @@
 										'select-booked': myBookSeatsIds.includes(seatIndex),
 										'booked': tableStatus[0] === 0,
 										'not-booked':   tableStatus[0] !== 0 }">
+									{{isEdit && myBookSeatsIds.includes(seatIndex) ?"✔":""}}
 								</view>
 							</view>
 						</view>
@@ -49,12 +57,13 @@
 									'select-booked': myBookSeatsIds.includes(seatIndex),
 									'booked':  tableStatus[1] === 0,
 									'not-booked': tableStatus[1] !== 0 }">
+									{{isEdit && myBookSeatsIds.includes(seatIndex) ?"✔":""}}
 								</view>
 							</view>
 							<view :class="{ 'table2': true,
 								'booked':  tableStatus[1] === 0,
 								'not-booked': tableStatus[1] !== 0 }">
-								{{ tableStatus[1] === 0 ? '不可预定':"点击预订"}}
+								{{ tableStatus[1] === 0 ? '不可预订':"点击预订"}}
 							</view>
 							<view class="fcc-center gap-12">
 								<view v-for="seatIndex in [8,9,10]" :key="seatIndex" @click="toggleBookSeats(1,seatIndex)" :class="{
@@ -63,6 +72,7 @@
 									'select-booked': myBookSeatsIds.includes(seatIndex),
 									'booked':  tableStatus[1] === 0,
 									'not-booked':  tableStatus[1] !== 0 }">
+									{{isEdit && myBookSeatsIds.includes(seatIndex) ?"✔":""}}
 								</view>
 							</view>
 						</view>
@@ -73,23 +83,25 @@
 										'seat': true,
 										'seat-top': true,
 										'select-booked': myBookSeatsIds.includes(seatIndex),
-										'booked': !myBookTableIds.includes(2) && tableStatus[2] === 0,
-										'not-booked': !myBookTableIds.includes(2) &&tableStatus[2] !== 0 }">
+										'booked':  tableStatus[2] === 0,
+										'not-booked': tableStatus[2] !== 0 }">
+									{{isEdit && myBookSeatsIds.includes(seatIndex) ?"✔":""}}
 								</view>
 							</view>
 							<view :class="{ 
 									'table': true,
-									'booked': !myBookTableIds.includes(2) && tableStatus[2] === 0,
-									'not-booked': !myBookTableIds.includes(2) && tableStatus[2] !== 0 }">
-								{{tableStatus[2] === 0?'不可预定':"点击预订"}}
+									'booked':  tableStatus[2] === 0,
+									'not-booked':  tableStatus[2] !== 0 }">
+								{{tableStatus[2] === 0?'不可预订':"点击预订"}}
 							</view>
 							<view class="flex seat-row">
 								<view v-for="seatIndex in [13,14]" :key="seatIndex" @click="toggleBookSeats(2,seatIndex)" :class="{ 
 										'seat': true,
 										'seat-bottom': true,
 										'select-booked': myBookSeatsIds.includes(seatIndex),
-										'booked': !myBookTableIds.includes(2) && tableStatus[2] === 0,
-										'not-booked': !myBookTableIds.includes(2) && tableStatus[2] !== 0 }">
+										'booked':  tableStatus[2] === 0,
+										'not-booked':  tableStatus[2] !== 0 }">
+									{{isEdit && myBookSeatsIds.includes(seatIndex) ?"✔":""}}
 								</view>
 							</view>
 						</view>
@@ -104,28 +116,36 @@
 														'select-booked': myBookTableIds.includes(tableIndex),
 														'booked':!myBookTableIds.includes(tableIndex) &&tableStatus[tableIndex]===0,
 														'not-booked':!myBookTableIds.includes(tableIndex) && tableStatus[tableIndex]!== 0 }">
+									{{isEdit && myBookTableIds.includes(tableIndex) ?"✔":""}}
 								</view>
 							</view>
 							<view class="bar-back fcs-between relative">
 								<view class="bar">
-									<text style="width: 22px;border:none" :class="{ 
+									<view style="width: 22px;border:none" :class="{ 
 										'fcc-center': true, 
-										'booked': tableStatus.some(table=>table===0),
-										'not-booked': tableStatus.some(table=>table===1) }">开放式吧台</text>
+										'booked': leftBarSeats===0 && tableStatus.some(table=>table===0),
+										'not-booked': leftBarSeats!==0 && tableStatus.some(table=>table===1) }">
+										<text>开放式吧台 — 剩余座位</text>
+										<text style="margin-left: -0.7em">{{leftBarSeats}}</text>
+									</view>
 								</view>
 							</view>
 						</view>
 						<view class="bar-tip">* 请点击座位进行预订</view>
 					</view>
-					<view class="light-mask">
+					<view class="light-mask" :style="{display: isEdit ? 'none' : `block`}">
 						<view class="light"></view>
 					</view>
 				</view>
 			</view>
-			<view class="frc-center" style="height: 172rpx">
+			<view class="frc-center gap-20" style="width: calc(100% - 24px); margin:'0px 12px';height: 172rpx" v-if="isEdit">
+				<button class="flex-1 next-step" style="color:#000000" @click="clear">清空选择</button>
+				<button class="flex-1 next-step next-step-black" @click="save">保存修改</button>
+			</view>
+			<view class="frc-center" style="height: 172rpx" v-else>
 				<input :class="{'phone':true,'phone-empty':phoneNumberEmpty}" name="input" placeholder="请输入预约人手机号"
 					@input="onKeyInput" />
-				<button class="next-step" @click="confirm">立即预定</button>
+				<button class="next-step" @click="confirm">立即预订</button>
 			</view>
 		</view>
 	</view>
@@ -133,48 +153,84 @@
 
 <script>
 	import {
-		postOrderInfo
+		postOrderInfo,
+		reqOneDaySeatsLeft
 	} from "../../api/order.js"
 	import {
-		getStorage
+		getStorage,
+		setStorage
 	} from "../../utils/storage.js"
 	import {
 		mapMutations,
 		mapState
 	} from 'vuex'
+	import {
+		systemInfo
+	} from "../../store/mixin.js"
+	import * as format from "../../utils/formatTime.js"
 	export default {
-		onLoad(options) {
-			// #ifdef MP-WEIXIN
-			uni.setBackgroundColor({
-				backgroundColor: "#000000"
-			})
-			// #endif
-			const res = getStorage('menuInfo')
-			console.log("menuInfo-res", res);
-			this.navBarHeight = res?.navBarHeight + 20 || 80
-			this.menuHeight = res?.menuHeight || 32
-			this.menuBottom = res?.menuBottom || 7
-			this.tableStatus = this.getTableBookArray()
+		async onLoad(options) {
+			if (options && options.edit === "1") {
+				this.isEdit = true
+				await this.initDayBookInfo()
+				this.tableStatus = this.getTableBookArray()
+			} else {
+				this.tableStatus = this.getTableBookArray()
+			}
+			this.initBackground(this.isEdit ? "#FFFFFF" : "#000000")
 		},
+		mixins: [systemInfo],
 		data() {
 			return {
-				navBarHeight: 80,
-				menuHeight: 32,
-				menuBottom: 7,
-				tableStatus: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 0代表已经被预订，1代表可以预定
-				myBookTableIds: [],
-				myBookSeatsIds: [],
+				tableStatus: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 0代表已经被别人预订，1代表可以预订，吧台椅子视为桌子，后八个元素都是代表吧台座位
+				myBookTableIds: [], // 选中的桌子
+				myBookSeatsIds: [], // 选中的椅子
 				phoneNumberEmpty: false,
-				phoneNumber: null
+				phoneNumber: null,
+				isEdit: false
 			}
 		},
 		computed: {
 			...mapState({
 				bookInfo: state => state.bookInfo,
 				desksLeft: state => state.desksLeft,
-			})
+			}),
+			leftBarSeats() {
+				// 吧台8个座位，减去被别人订的和自己选中的，剩余座位
+				let availableBarSeats = 0;
+				for (let tableIndex = 3; tableIndex <= 10; tableIndex++) {
+					if (this.tableStatus[tableIndex] === 1) {
+						const seatAvailable = this.tableStatus[tableIndex] === 1 && !this.myBookTableIds.includes(tableIndex);
+						if (seatAvailable) {
+							availableBarSeats++;
+						}
+					}
+				}
+				return availableBarSeats;
+			}
 		},
 		methods: {
+			clear() {
+				this.myBookTableIds = []
+				this.myBookSeatsIds = []
+			},
+			save() {
+				const orderDetail = getStorage("orderDetail")
+				const tempOrderDetail = {
+					...orderDetail,
+					"desk": this.myBookTableIds.map(id => id + 1),
+					"people": this.myBookSeatsIds.length + this.myBookTableIds.filter(tableId => tableId > 2)
+						.length, // 预订人数
+				}
+				setStorage("orderDetail", tempOrderDetail)
+				uni.navigateBack()
+			},
+			async initDayBookInfo() {
+				const orderDetail = getStorage("orderDetail")
+				const reqTime = orderDetail.dateInfo
+				const res = await reqOneDaySeatsLeft(reqTime)
+				this.seatsLeft = res
+			},
 			onKeyInput: function(event) {
 				this.phoneNumber = event.detail.value;
 				this.phoneNumberEmpty = false
@@ -183,37 +239,61 @@
 				if (this.myBookTableIds.length === 0) {
 					uni.showModal({
 						title: "提交失败",
-						content: "请至少预定一个座位"
+						content: "请至少预订一个座位"
 					})
 				} else if (!this.phoneNumber) {
-					console.log("this.phoneNumber", this.phoneNumber);
 					this.phoneNumberEmpty = true
 				} else {
 					const response = await postOrderInfo({
 						"desk": this.myBookTableIds.map(id => id + 1),
-						"people": this.myBookSeatsIds.length, // 预订人数
+						"people": this.myBookSeatsIds.length + this.myBookTableIds.filter(tableId => tableId > 2)
+							.length, // 预订人数
 						"phoneNumber": this.phoneNumber,
 						...this.bookInfo,
 					});
 					if (response) {
-						uni.navigateTo({
-							url: '/pages/myorders/myorders'
+						uni.showModal({
+							title: "预订成功",
+							content: "点击确认，进入订单页查看",
+							showCancel: false,
+							success: () => {
+								uni.navigateTo({
+									url: '/pages/myorders/myorders',
+								})
+							}
 						})
 					}
 				}
 			},
 			handleBack() {
-				uni.navigateTo({
-					url: '/pages/book/book'
-				})
+				uni.navigateBack()
 			},
 			getTableBookArray(val) {
-				const tableBookArray = new Array(11).fill(0); // 0代表已经被预订，不可预订了，1代表可以预定
-				for (const deskNumber of this.desksLeft) {
-					tableBookArray[deskNumber - 1] = 1;
+				const tableBookArray = new Array(11).fill(0); // 0代表已经被预订，不可预订了，1代表可以预订
+				if (this.isEdit) {
+					const orderDetail = getStorage("orderDetail")
+					let desksLeft = [] // 后台显示的剩余的桌子编号
+					if (orderDetail.timeInfo === 0) {
+						desksLeft = this.seatsLeft.desk0
+					} else {
+						desksLeft = this.seatsLeft.desk1
+					}
+					const deskEditing = Array.from(new Set(orderDetail.desk.concat(desksLeft))) // 订单中已经被选的desk，状态设置为可以重新选
+
+					for (const deskNumber of deskEditing) {
+						tableBookArray[deskNumber - 1] = 1;
+					}
+					this.myBookTableIds = orderDetail.desk.map(d => d - 1)
+					this.myBookSeatsIds = this.initSeatsIds(orderDetail.desk)
+					return tableBookArray
+				} else {
+					for (const deskNumber of this.desksLeft) {
+						tableBookArray[deskNumber - 1] = 1;
+					}
 				}
 				return tableBookArray;
 			},
+			// 吧台只传递桌子id, 吧台一个椅子视为一个桌子
 			toggleBookSeats(tableIndex, seatIndex) {
 				if (this.tableStatus?.[tableIndex] === 0) {
 					return false
@@ -267,17 +347,26 @@
 					}
 					this.myBookSeatsIds = Array.from(seatsIndexSet)
 				}
+			},
+			initSeatsIds(desks) {
+				let ids = []
+
+				if (desks.includes(1)) {
+					ids = ids.concat([1, 2, 3, 4])
+				}
+				if (desks.includes(2)) {
+					ids = ids.concat([5, 6, 7, 8, 9, 10])
+				}
+				if (desks.includes(3)) {
+					ids = ids.concat([11, 12, 13, 14])
+				}
+				return ids
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.capsule-box {
-		display: flex;
-		padding: 48rpx;
-	}
-
 	.nav-wrap {
 		position: absolute;
 		top: 0;
@@ -307,7 +396,6 @@
 		display: flex;
 		flex-direction: column;
 		position: relative;
-		height: 100%;
 		padding: 0rpx 10rpx 20rpx 10rpx;
 
 		.back-image {
@@ -346,6 +434,11 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
+		}
+
+		.next-step-black {
+			background-color: #000000;
+			width: 100%;
 		}
 
 		.container {
@@ -458,8 +551,8 @@
 
 		.bar-tip {
 			position: absolute;
-			right: 0;
-			bottom: 0;
+			right: 10px;
+			bottom: 10px;
 			color: #907f6c;
 			font-size: 24rpx;
 		}
@@ -499,17 +592,16 @@
 		}
 
 		.bar text {
-			color: #907f6c;
 			font-size: 24rpx;
 		}
 
 		.booked {
-			color: #9D8B86;
+			color: #907f6c;
 			border: 2px solid #423A38;
 		}
 
 		.not-booked {
-			color: #9D8B86;
+			color: #d05f2e;
 			border: 2px solid #4D2615;
 		}
 
@@ -518,28 +610,46 @@
 			border: 2px solid #F06627;
 		}
 
+		.isEdit {
+			.booked {
+				color: #ACACAC;
+				border: 2px solid #DFDFDF;
+			}
+
+			.not-booked {
+				color: #4D2615;
+				border: 2px solid #4D2615;
+			}
+
+			.select-booked {
+				color: #4D2615;
+				border: 2px solid #4D2615;
+				background-color: #d8d8d8;
+			}
+		}
+
 		.seat-left {
 			border-top-left-radius: 50%;
 			border-bottom-left-radius: 50%;
-			border-right: 0px;
+			border-right: 0px !important;
 		}
 
 		.seat-right {
 			border-top-right-radius: 50%;
 			border-bottom-right-radius: 50%;
-			border-left: 0px;
+			border-left: 0px !important;
 		}
 
 		.seat-top {
 			border-top-left-radius: 50%;
 			border-top-right-radius: 50%;
-			border-bottom: 0px;
+			border-bottom: 0px !important;
 		}
 
 		.seat-bottom {
 			border-bottom-left-radius: 50%;
 			border-bottom-right-radius: 50%;
-			border-top: 0px;
+			border-top: 0px !important;
 		}
 	}
 </style>

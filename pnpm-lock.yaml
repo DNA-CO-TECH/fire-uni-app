@@ -8,15 +8,24 @@ importers:
 
   .:
     dependencies:
+      radash:
+        specifier: ^12.1.0
+        version: 12.1.0
       uni-ajax:
         specifier: ^2.5.1
         version: 2.5.1
 
 packages:
 
+  radash@12.1.0:
+    resolution: {integrity: sha512-b0Zcf09AhqKS83btmUeYBS8tFK7XL2e3RvLmZcm0sTdF1/UUlHSsjXdCcWNxe7yfmAlPve5ym0DmKGtTzP6kVQ==}
+    engines: {node: '>=14.18.0'}
+
   uni-ajax@2.5.1:
     resolution: {integrity: sha512-xmJY/yl5eRAb0b2qujTS1XNYhkSRWGL4PwkYqQrLpH2BMa2v/2zCJtqcTVUmqn4qQtdP3vLoFL86vaH3ABYAZA==}
 
 snapshots:
+
+  radash@12.1.0: {}
 
   uni-ajax@2.5.1: {}

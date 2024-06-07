@@ -15,6 +15,20 @@ export const reqOrderInfo = async (date) => {
 }
 
 /**
+ * @description 查询指定日期的可预订数量
+ * @param {number} dateInfo 指定日期
+ * @returns Promise
+ */
+export const reqOneDaySeatsLeft = async (dateInfo) => {
+	const res = await http.get(`/app/order/order/one/${dateInfo}`)
+	if (res.success && res.data) {
+		return res.data
+	} else {
+		return []
+	}
+}
+
+/**
  * @description 创建订单
  * @param {*} form 
  * @returns Promise

@@ -3,7 +3,7 @@
 		<view class="home-content">
 			<image class="back-image" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/superfire.webp" />
 			<image class="logo" :fade-show="true" mode="widthFix" src="/static/home/yan.png" />
-			<view class="book" @click="handleClick">
+			<view :class="`book ${animate?'text-animation':''}`" @click="handleClick">
 				<view class="button-wrap">
 					<view class="button" style="z-index: 1;">欢迎预订</view>
 					<image class="image" :fade-show="true" mode="widthFix" src="/static/home/arrow-down.png" />
@@ -17,8 +17,21 @@
 	import {
 		getStorage
 	} from "/utils/storage.js"
+	import {
+		getOrderList,
+	} from "/api/order.js"
+	import {
+		systemInfo
+	} from "../../store/mixin";
 	export default {
+		data() {
+			return {
+				animate: false
+			}
+		},
+		mixins: [systemInfo],
 		onLoad() {
+			this.initBackground("#000000")
 			console.log('开始加载音频');
 			this.innerAudioContext = uni.createInnerAudioContext();
 			this.innerAudioContext.autoplay = true;
@@ -34,24 +47,38 @@
 		},
 		onHide() {
 			this.innerAudioContext.pause()
+			this.animate = false
 		},
 		onShow() {
 			this.innerAudioContext.play()
+			this.animate = true
 		},
 		methods: {
-			handleClick() {
+			async handleClick() {
 				const cache = getStorage("userInfo")
-				console.log("cache", cache);
-				// 没登陆过，弹出登录组件 | 管理员进登录页面选身份
-				if (!cache || cache.isAdmin === true) {
-					uni.navigateTo({
-						url: "/pages/login/login"
+				// 登陆过，普通用户
+				if (cache && cache.isAdmin === 0) {
+					const data = await getOrderList({
+						count: 6,
+						page: 1,
+						userId: cache?.userId
 					})
-				}
-				// 登陆过根据缓存的信息判断是否是管理员，不是则直接进入book, 是的话进入login页面选身份
-				else {
+					// 根据结果判断去往订单页还是预订页面
+					if (data?.success) {
+						uni.navigateTo({
+							url: "/pages/myorders/myorders",
+						})
+					} else {
+						uni.navigateTo({
+							url: "/pages/book/book",
+						})
+					}
+				} else {
+					// 没登陆过，进入登陆页面 | 登陆过，管理员进登录页面选身份
 					uni.navigateTo({
-						url: "/pages/book/book"
+						url: "/pages/login/login",
+						animationType: "slide-in-bottom",
+						animationDuration: 300
 					})
 				}
 			}
@@ -60,12 +87,6 @@
 </script>
 
 <style lang="scss">
-	page-head,
-	page-body {
-		height: 100%;
-		background-color: transparent;
-	}
-
 	.home-content {
 		display: flex;
 		flex-direction: column;
@@ -93,11 +114,11 @@
 
 	.home-content .image {
 		width: 16px;
+		transform: rotate(-90deg);
 	}
 
 	.home-content .button-wrap {
 		display: flex;
-		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		gap: 10px;
@@ -110,8 +131,23 @@
 	}
 
 	.home-content .book {
-		margin-bottom: 40px;
-		background-color: #14141411;
+		margin-bottom: 130rpx;
 		cursor: pointer;
+	}
+
+	@keyframes text-animation {
+		from {
+			opacity: 0;
+			transform: translateX(-50px);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateX(0);
+		}
+	}
+
+	.text-animation {
+		animation: text-animation 1.6s ease-in-out forwards;
 	}
 </style>

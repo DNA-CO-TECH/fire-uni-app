@@ -69,7 +69,7 @@ instance.interceptors.response.use((res, config) => {
 					clearStorage()
 
 					uni.navigateTo({
-						url: '/pages/login/login'
+						url: '/pages/login/login',
 					})
 				},
 				error: () => {

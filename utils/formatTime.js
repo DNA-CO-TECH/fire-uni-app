@@ -42,6 +42,13 @@ const formatDate = (date, fmt, type) => {
 	return fmt
 }
 
+function getTodayZeroTimestamp() {
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+	return today.getTime();
+}
+
 export {
-	formatDate
+	formatDate,
+	getTodayZeroTimestamp
 }

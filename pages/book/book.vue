@@ -1,22 +1,21 @@
 <template>
 	<view class="root flex flex-col">
 		<view class="nav-wrap"
-			:style="`height:${navBarHeight}px; background: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yan_background1.png'); background-size: 100% ${navBarHeight}px;`">
+			:style="`height:${navHeight}px; background: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yan_background1.png'); background-size: 100% ${navHeight}px;`">
 			<!-- 胶囊区域 -->
 			<view class="capsule-box"
-				:style="`height:${menuHeight}px; min-height:${menuHeight}px; line-height:${menuHeight}px; bottom:${menuBottom}px;`">
-				<image class="nav-logo" src="/static/home/yan.png"></image>
+				:style="`height:${navigationBarHeight}px; min-height:${navigationBarHeight}px; line-height:${navigationBarHeight}px; margin-top:${statusBarHeight}px;`">
+				<image class="nav-logo" src="/static/home/yan.png" @click="handleHome"></image>
 				<view class="nav-title" style="flex:1; text-align: center">餐厅预订</view>
 			</view>
-			<text class="logo-slogan">燃烧另一种意义</text>
 		</view>
 		<view class="book-container" style="flex:1">
-			<view class="z-1 h-full">
-				<ZuiCalendar v-if="extraData" rootClass="calender-container" :list="list" :extraData="extraData"
+			<view class="z-1">
+				<ZuiCalendar :loading="loading" rootClass="calender-container" :list="list" :extraData="extraData"
 					@click-period="clickPeriod" @click-active="clickActiveDay" @next-month="nextMonth" @last-month="lastMonth">
 				</ZuiCalendar>
 			</view>
-			<button class="next-step" @click="nextStep">下一步</button>
+			<button class="next-step mt-12" @click="nextStep">下一步</button>
 		</view>
 	</view>
 </template>
@@ -35,6 +34,9 @@
 		reqOrderInfo
 	} from "/api/order.js"
 	import * as format from "../../utils/formatTime.js"
+	import {
+		systemInfo
+	} from "../../store/mixin.js"
 	export default {
 		components: {
 			ZuiCalendar,
@@ -45,19 +47,14 @@
 				backgroundColor: "#000000"
 			})
 			// #endif
-			const res = getStorage('menuInfo')
-			this.navBarHeight = res?.navBarHeight + 60 || 120
-			this.menuHeight = res?.menuHeight || 32
-			this.menuBottom = res?.menuBottom || 7
+			this.getSystemInfo()
 
 			this.dateInfo = new Date().getTime()
 			this.getOrdersByDate()
 		},
+		mixins: [systemInfo],
 		data() {
 			return {
-				navBarHeight: 120,
-				menuHeight: 32,
-				menuBottom: 7,
 				list: [{
 						time: 0,
 						isChosen: true
@@ -68,8 +65,9 @@
 					}
 				],
 				upDatakey: '', //为重新渲染DOM值，入不需要则可取消
-				extraData: null,
-				time: 0
+				extraData: [],
+				time: 0,
+				loading: false // 日历剩余座位请求loading
 			}
 		},
 		computed: {
@@ -79,6 +77,11 @@
 		},
 		methods: {
 			...mapMutations(['setBookInfo', 'setDesksLeft']),
+			handleHome() {
+				uni.navigateTo({
+					url: '/pages/index/index',
+				})
+			},
 			// 点击日数方法
 			clickActiveDay({
 				year,
@@ -138,11 +141,13 @@
 				this.setBookInfo(newBookInfo)
 				this.setDesksLeft(this.desksleft)
 				uni.navigateTo({
-					url: `/pages/seat-map/seat-map`
+					url: `/pages/seat-map/seat-map`,
 				})
 			},
 			async getOrdersByDate(date) {
-				const res = await reqOrderInfo(date || new Date().getTime());
+				const currentTime = format.getTodayZeroTimestamp()
+				this.loading = true
+				const res = await reqOrderInfo(date || currentTime);
 				if (res) {
 					const deskCanbeBooked = res.map((dayInfo) => ({
 						date: format.formatDate(dayInfo.date, 'yyyy-MM-dd'),
@@ -155,17 +160,13 @@
 					this.activeDayDeskLeft = [matchDay?.desk0, matchDay?.desk1]
 					this.desksleft = this.time === 0 ? matchDay?.desk0 : matchDay?.desk1
 				}
+				this.loading = false
 			}
 		}
 	}
 </script>
 
 <style scoped>
-	.capsule-box {
-		display: flex;
-		padding: 48rpx;
-	}
-
 	.nav-wrap .nav-logo {
 		width: 40rpx;
 		height: 48rpx;

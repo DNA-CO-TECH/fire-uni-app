@@ -30,9 +30,10 @@
 						<view class="date-week">
 							<view class="week-item" v-for="item in weekList" :key="item"><text>周{{item}}</text></view>
 						</view>
-						<view class="day-content" :style="{height: isOpen ? '100rpx' : 'auto'}" v-if="dayList.length > 0">
-							<!-- 	<view class="day-item day-month" v-if="!isOpen"><text>{{month < 10 ? `0${month}` : month}}</text>
-						  </view> -->
+						<view v-show="loading" class="fcc-center relative" style="height:712rpx;color:#F06627">
+							<text>正在请求...</text>
+						</view>
+						<view v-show="!loading" class="day-content" :style="{height: isOpen ? '100rpx' : 'auto'}">
 							<view class="day-item" v-for="(item, index) in dayList" :key="index" :data-index="index"
 								@click="toActive(item, index)">
 								<text class="day-text" v-if="item.day"
@@ -40,14 +41,6 @@
 								<text
 									:class="{'value-text':true, 'text-gold': item.data.value, 'text-gray':item.data.value}">{{item.data.value}}</text>
 							</view>
-						</view>
-					</view>
-					<view style="width: 100%;" v-if="isShrink">
-						<view class="toggle" v-if="isOpen" @click="toShrinkClose">
-							<view class="iconfont icon-shousuo"></view>
-						</view>
-						<view class="toggle" v-else @click="toShrink">
-							<view class="iconfont icon-zhankai"></view>
 						</view>
 					</view>
 				</view>
@@ -65,33 +58,6 @@
 					</view>
 				</slot>
 			</view>
-			<view class="modal" v-if="show">
-				<view class="mask" @click="close" v-if="closeOnClickOverlay"></view>
-				<view class="z-content">
-					<view class="modal-content">
-						<view class="z-modal" :style="{width: width}">
-							<view class="modal-title">
-								<slot name="title"><text>{{title}}</text></slot>
-							</view>
-							<view class="z-modal-content">
-								<slot name="content"><text>{{content}}</text></slot>
-							</view>
-							<view class="line"></view>
-							<view class="modal-foot">
-								<slot name="footer">
-									<view class="cancel" @click="cancel" v-if="showCancelButton">
-										<text :style="{color: cancelColor}">{{cancelText}}</text>
-									</view>
-									<view class="foot-line" v-if="showCancelButton && showConfirmButton"></view>
-									<view class="confirm" @click="confirm" v-if="showConfirmButton">
-										<text :style="{color: confirmColor}">{{confirmText}}</text>
-									</view>
-								</slot>
-							</view>
-						</view>
-					</view>
-				</view>
-			</view>
 		</view>
 	</template>
 
@@ -99,6 +65,10 @@
 		export default {
 			name: 'zui-calender',
 			props: {
+				loading: {
+					type: Boolean,
+					default: false
+				},
 				rootClass: "",
 				list: {
 					type: Array,
@@ -229,13 +199,6 @@
 				this.day = day
 				this.initTime()
 				this.initApi(this.year, this.month)
-			},
-			onNavigationBarButtonTap(e) {
-				console.log(e)
-				uni.showToast({
-					title: '分享',
-					duration: 2000
-				});
 			},
 			methods: {
 				initTime() {

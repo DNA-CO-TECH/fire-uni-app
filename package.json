@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"radash": "^12.1.0",
 		"uni-ajax": "^2.5.1"
 	}
 }

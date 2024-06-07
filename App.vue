@@ -3,6 +3,11 @@
 		setStorage
 	} from '/utils/storage.js'
 	export default {
+		globalData: {
+			statusBarHeight: 0, // 状态导航栏高度
+			navHeight: 0, // 总体高度
+			navigationBarHeight: 0, // 导航栏高度(标题栏高度)
+		},
 		onLaunch() {
 			this.calcNavBarInfo()
 		},
@@ -17,58 +22,62 @@
 			 * @description 计算导航栏信息
 			 */
 			calcNavBarInfo() {
-				uni.getSystemInfo({
-					success: res => {
-						console.log("res", res);
-						let menuButtonInfo = {}
-						if (res.platform === 'ios' || res.osName === 'ios') {
-							// ios设备的胶囊按钮都是固定的
-							menuButtonInfo = {
-								width: 87,
-								height: 32,
-								left: res.screenWidth - 7 - 87,
-								right: res.screenWidth - 7,
-								top: res.statusBarHeight + 4,
-								bottom: res.statusBarHeight + 4 + 32
-							}
-						} else {
-							// 安卓通过api获取
-							menuButtonInfo = wx.getMenuButtonBoundingClientRect()
-						}
-						console.log('获取胶囊信息：', menuButtonInfo);
-						// 导航栏高度 = 状态栏到胶囊的间距（胶囊距上未知-状态栏高度）* 2 + 胶囊高度 + 状态栏高度
-						const navHeight = (menuButtonInfo.top - res.statusBarHeight) * 2 + menuButtonInfo.height + res
-							.statusBarHeight;
-						// 按钮上下边距高度
-						const menuBottom = menuButtonInfo.top - res.statusBarHeight;
-						// 导航栏右边到屏幕边缘的距离
-						const menuRight = res.screenWidth - menuButtonInfo.right;
-						// 导航栏高度
-						const menuHeight = menuButtonInfo.height;
+				console.log("App Launch")
 
-						setStorage("menuInfo", {
-							navHeight,
-							menuBottom,
-							menuRight,
-							menuHeight
-						})
-					}
-				})
+				// 状态栏高度
+				this.globalData.statusBarHeight = uni.getSystemInfoSync().statusBarHeight
+
+				// #ifdef MP-WEIXIN
+				// 获取微信胶囊的位置信息 width,height,top,right,left,bottom
+				const custom = wx.getMenuButtonBoundingClientRect()
+
+				// 导航栏高度(标题栏高度) = 胶囊高度 + (顶部距离 - 状态栏高度) * 2
+				this.globalData.navigationBarHeight = custom.height + (custom.top - this.globalData.statusBarHeight) * 2
+				// console.log("导航栏高度："+this.globalData.navigationBarHeight)
+
+				// 总体高度 = 状态栏高度 + 导航栏高度
+				this.globalData.navHeight = this.globalData.navigationBarHeight + this.globalData.statusBarHeight
+				// #endif
+
+				// #ifdef H5
+				this.globalData.statusBarHeight = 0
+				this.globalData.navigationBarHeight = 64
+				this.globalData.navHeight = 64
+				// #endif
+
+				console.log("this.globalData", this.globalData)
 			}
 		},
 	}
 </script>
 
 <style lang="scss">
+	page-head,
+	page-body,
+	uni-page-head,
+	uni-page-body {
+		background-color: transparent !important;
+	}
+
 	page {
 		background-color: black;
+	}
+
+	.uni-page-head {
+		background-color: transparent !important;
+	}
+
+	.capsule-box {
+		display: flex;
+		align-items: center;
+		padding: 0px 48rpx;
 	}
 
 	.root {
 		position: absolute;
 		width: 100%;
 		height: 100%;
-		background: black;
+		background: transparent;
 	}
 
 	.text-left {
@@ -105,6 +114,22 @@
 
 	.h-full {
 		height: 100%;
+	}
+
+	.relative {
+		position: relative;
+	}
+
+	.absolute {
+		position: absolute;
+	}
+
+	.top-0 {
+		top: 0
+	}
+
+	.left-0 {
+		left: 0
 	}
 
 	.fcc-center {

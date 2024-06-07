@@ -1,57 +1,70 @@
 <template>
 	<view class="root flex flex-col">
 		<view class="nav-wrap"
-			:style="`height:${navBarHeight}px; background: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yan_background1.png'); background-size: 100% ${navBarHeight}px;`">
+			:style="`height:${navHeight}px; background: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yan_background1.png'); background-size: 100% ${navHeight}px;`">
 			<!-- 胶囊区域 -->
 			<view class="capsule-box"
-				:style="`height:${menuHeight}px; min-height:${menuHeight}px; line-height:${menuHeight}px; bottom:${menuBottom}px;`">
+				:style="`height:${navigationBarHeight}px; min-height:${navigationBarHeight}px; line-height:${navigationBarHeight}px; margin-top:${statusBarHeight}px;`">
 				<image class="nav-logo" src="/static/home/yan.png" @click="handleHome"></image>
 				<view class="nav-title" style="flex:1; text-align: center">我的预订</view>
 			</view>
 			<text class="logo-slogan">燃烧另一种意义</text>
 		</view>
-		<view class="myorders-container fcc-start gap-20">
-			<view class="list-item-wrap mt-12" v-for="item in orderList" :key="item.id">
-				<view class="list-item-title">
-					<image class="logo" src="/static/home/yan.png" alt="logo" />
-				</view>
-				<view class="fcc-center mt-10">————————</view>
-				<view class="list-item-content">
-					<view>
-						<text class="content-title">预约信息</text>
+		<data-list :page="page" :size="size" emptyText="~ 我是有底线的 ~" @load="handleLoad" @refresh="handleRefresh"
+			@scrollTolower="handleScrolltolower">
+			<view class="myorders-container fcc-start gap-20">
+				<view class="list-item-wrap mt-12" v-for="item in orderList" :key="item.id">
+					<view class="list-item-title">
+						<image class="logo" src="/static/home/yan.png" alt="logo" />
 					</view>
-					<view class="mb-20">
-						<text>{{new Date(item.dateInfo).getMonth()+1}}月{{new Date(item.dateInfo).getDate()}}日
-							{{item.timeInfo===0?'17:30~18:30':'19:00 ~20:00'}}</text>
+					<view class="fcc-center mt-10">————————</view>
+					<view class="list-item-content">
+						<view>
+							<text class="content-title">预约信息</text>
+						</view>
+						<view class="mb-20">
+							<text>{{new Date(item.dateInfo).getMonth()+1}}月{{new Date(item.dateInfo).getDate()}}日
+								{{item.timeInfo===0?'17:30~18:30':'19:00 ~20:00'}}</text>
+						</view>
+						<view>
+							<text class="content-title">取消规则</text>
+						</view>
+						<view class="mb-20">
+							<text>30分钟内未到场，预订将自动取消</text>
+						</view>
+						<view>
+							<text class="content-title">餐厅地址</text>
+						</view>
+						<view class="mb-20">
+							<text>浙江省安吉县溪龙乡树下小白屋</text>
+						</view>
+						<view>
+							<text class="content-title">餐厅联系方式</text>
+						</view>
+						<view class="frc-center">
+							<text>17606988669</text>
+							<button class="copy" @click.stop="copyPhone(17606988669)">复制</button>
+						</view>
 					</view>
-					<view>
-						<text class="content-title">取消政策</text>
-					</view>
-					<view class="mb-20">
-						<text>30分钟内未到场，预订将自动取消</text>
-					</view>
-					<view>
-						<text class="content-title">餐厅地址</text>
-					</view>
-					<view>
-						<text>浙江省安吉县溪龙乡树下小白屋</text>
-					</view>
-				</view>
-				<view class="list-item-operations w-full frc-between mt-32">
-					<view class="flex-1 text-left" @click="handleCancelOrder(item)">
-						<image src="/static/book/x.png" class="close-icon" />
-						<text>取消预订</text>
-					</view>
-					<view class="flex-1 text-right" @click="handleShare">
-						<image src="/static/book/arrow-up-right.png" class="arrow-tr-icon" />
-						<text>分享给朋友</text>
+					<view class="list-item-operations w-full frc-between mt-32">
+						<view class="flex-1 text-left" @click="handleCancelOrder(item)">
+							<image src="/static/book/x.png" class="close-icon" />
+							<text>取消预订</text>
+						</view>
+						<view class="flex-1 text-right" @click="shareCanvasImage">
+							<image src="/static/book/arrow-up-right.png" class="arrow-tr-icon" />
+							<text>分享给朋友</text>
+						</view>
 					</view>
 				</view>
 			</view>
-			<view class="add-neworder mt-32" @click="addNewOrder">
+		</data-list>
+		<view class="footer-container">
+			<view class="add-neworder" @click="addNewOrder">
 				<text class="item-operate">+ 新增预订</text>
 			</view>
 		</view>
+		<Poster @onUrlReady="handleUrlReady"></Poster>
 	</view>
 </template>
 
@@ -66,53 +79,100 @@
 		getOrderList,
 		deleteOrder
 	} from "/api/order.js"
+	import {
+		systemInfo
+	} from "../../store/mixin.js"
+	import Poster from "./poster.vue"
 	export default {
+		components: {
+			Poster
+		},
 		onLoad() {
-			// #ifdef MP-WEIXIN
-			uni.setBackgroundColor({
-				backgroundColor: "#000000"
-			})
-			// #endif
-			const res = getStorage('menuInfo')
-			console.log("menuInfo-res", res);
-			this.navBarHeight = res?.navBarHeight + 60 || 120
-			this.menuHeight = res?.menuHeight || 32
-			this.menuBottom = res?.menuBottom || 7
-
+			this.initBackground("#000000")
 			this.initMyOrders()
 		},
+		mixins: [systemInfo],
 		data() {
 			return {
-				navBarHeight: 120,
-				menuHeight: 32,
-				menuBottom: 7,
-				orderList: []
+				page: 1,
+				size: 6,
+				orderList: [],
+				canvasImagePath: ''
 			}
 		},
 		methods: {
+			async handleRefresh(params, callback) {
+				this.orderList = [];
+				this.data = [];
+				this.total = 0;
+				this.page = 1;
+				this.size = 6;
+				const data = await this.initMyOrders()
+				this.data = data.data;
+				this.total = data.last_page;
+				callback({
+					list: this.data,
+					total: this.total,
+				});
+			},
+			handleScrolltolower(event) {
+				if (this.data.length < this.total) {
+					this.loadNextPage();
+				}
+			},
+			async loadNextPage() {
+				const currentPage = this.page + 1;
+				const pageSize = this.size;
+				this.page = currentPage;
+				this.size = pageSize;
+				const data = await this.initMyOrders()
+				this.data = data.data;
+				this.total = data.last_page;
+				this.list = this.list.concat(data);
+				this.total = this.total;
+			},
+			async handleLoad(params, callback) {
+				this.page = params.page;
+				this.size = params.size;
+				const data = await this.initMyOrders()
+				this.data = data.data;
+				this.total = data.last_page;
+				callback({
+					list: this.data,
+					total: this.total,
+				});
+			},
+			// 复制手机号
+			copyPhone(phone) {
+				uni.setClipboardData({
+					data: phone.toString(),
+					success: () => {
+						uni.showToast({
+							title: '手机号已复制',
+							icon: 'none'
+						});
+					}
+				});
+			},
 			handleHome() {
 				uni.navigateTo({
-					url: '/pages/index/index'
+					url: '/pages/index/index',
 				})
 			},
 			async initMyOrders() {
 				const userInfo = getStorage("userInfo")
 				const params = {
-					count: 6,
-					page: 1,
+					count: this.size,
+					page: this.page,
 					userId: userInfo?.userId
-					// dateStartInfo: new Date(new Date().getTime() - 31 * 24 * 60 * 60 * 1000).getTime(),
-					// dateEndInfo: new Date().getTime(),
-					// order:,
-					// phoneNumber,
-					// timeInfo: ,
 				}
 				const data = await getOrderList(params)
-				this.orderList = data.data
+				this.orderList = this.orderList.concat(data.data)
+				return data
 			},
 			addNewOrder() {
 				uni.navigateTo({
-					url: '/pages/book/book'
+					url: '/pages/book/book',
 				})
 			},
 			// handleEditOrder() {
@@ -122,40 +182,76 @@
 			// 	})
 			// },
 			async handleCancelOrder(item) {
-				console.log("发送取消的请求，然后刷新当前页面")
 				await deleteOrder(item.orderId)
-				this.orderList = this.orderList.filter(order => order.orderId !== item.orderId)
-			},
-			handleShare(item) {
-				uni.share({
-					provider: "weixin",
-					scene: "WXSceneSession",
-					type: 1,
-					summary: "我正在使用HBuilderX开发uni-app，赶紧跟我一起来体验！",
-					success: function(res) {
-						console.log("success:" + JSON.stringify(res));
-					},
-					fail: function(err) {
-						console.log("fail:" + JSON.stringify(err));
+				uni.showToast({
+					title: "取消成功",
+					success: () => {
+						this.orderList = this.orderList.filter(order => order.orderId !== item.orderId)
 					}
-				});
+				})
+			},
+			handleUrlReady(e) {
+				console.log("handleUrlReady");
+				this.canvasImagePath = e
+			},
+			// 自定义分享方法
+			shareCanvasImage() {
+				if (this.canvasImagePath) {
+					console.log("this.canvasImagePath", this.canvasImagePath);
+					wx.showShareImageMenu({
+						path: this.canvasImagePath
+					})
+				} else {
+					uni.showToast({
+						title: '请先生成图片',
+						icon: 'none'
+					});
+				}
 			}
+		},
+		// 分享功能
+		onShareAppMessage() {
+			return {
+				title: '分享标题',
+				path: '/pages/index/index', // 分享的路径，根据需要修改
+				imageUrl: this.canvasImagePath // 分享的图片路径
+			};
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	button::after {
+		border: none;
+	}
+
+	button {
+		position: relative;
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		padding-left: 0px;
+		padding-right: 0px;
+		box-sizing: border-box;
+		text-align: center;
+		text-decoration: none;
+		line-height: 1.35;
+		-webkit-tap-highlight-color: transparent;
+		overflow: hidden;
+		color: #ffffff;
+		background-color: transparent;
+		width: 100%;
+		height: 100%;
+	}
+
 	.nav-wrap {
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 160rpx;
 		z-index: 1;
 
 		.capsule-box {
-			display: flex;
-			padding: 48rpx;
 
 			.nav-logo {
 				width: 40rpx;
@@ -188,7 +284,7 @@
 		.list-item-wrap {
 			z-index: 1;
 			width: calc(100% - 140rpx);
-			height: 376px;
+			height: 400px;
 			padding: 70rpx;
 			border-radius: 12rpx;
 			background-image: url(/static/book/order.png);
@@ -209,7 +305,7 @@
 				font-weight: 700;
 				color: #C4C6CA;
 				text-align: center;
-				padding-top: 50rpx;
+				padding-top: 20rpx;
 
 				.logo {
 					width: 28px;
@@ -222,6 +318,16 @@
 				font-size: 28rpx;
 				color: #C4C6CA;
 				text-align: center;
+
+				.copy {
+					width: 100rpx;
+					font-size: 24rpx;
+					border: 1px solid #E7E7E7;
+					padding: 6rpx 10rpx;
+					margin: 0px;
+					margin-left: 20rpx;
+					border-radius: 16rpx;
+				}
 			}
 
 			.list-item-operations {
@@ -247,21 +353,35 @@
 				}
 			}
 		}
+	}
+
+	.footer-container {
+		position: fixed;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		width: 100vw;
+		height: 80px;
+		z-index: 1111;
+		background: linear-gradient(to bottom, #13141544 0%, #bb682B 70%, #ED682B 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
 		.add-neworder {
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			height: 48px;
-			width: 100%;
-			border: 1px solid #ED682B;
 			cursor: pointer;
-			z-index: 1;
+			border: 1px solid transparent;
+			box-sizing: border-box;
+			width: 90%;
+			margin-top: 20px;
 
 			text {
 				padding: 10px;
 				text-align: center;
-				color: #ED682B;
+				color: #ffffff;
 			}
 		}
 	}
