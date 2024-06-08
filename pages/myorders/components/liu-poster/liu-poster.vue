@@ -373,5 +373,10 @@
 		z-index: -999999 !important;
 		opacity: 0;
 		top: -5000rpx;
+		box-sizing: border-box;
+
+		.canvas-item {
+			box-sizing: border-box;
+		}
 	}
 </style>

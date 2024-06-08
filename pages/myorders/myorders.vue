@@ -51,10 +51,7 @@
 							<image src="/static/book/x.png" class="close-icon" />
 							<text>取消预订</text>
 						</view>
-						<view class="flex-1 text-right" @click="shareCanvasImage">
-							<image src="/static/book/arrow-up-right.png" class="arrow-tr-icon" />
-							<text>分享给朋友</text>
-						</view>
+						<ShareOrder :order="item" @onUrlReady="handleShareReady" />
 					</view>
 				</view>
 			</view>
@@ -64,7 +61,6 @@
 				<text class="item-operate">+ 新增预订</text>
 			</view>
 		</view>
-		<Poster @onUrlReady="handleUrlReady"></Poster>
 	</view>
 </template>
 
@@ -82,10 +78,10 @@
 	import {
 		systemInfo
 	} from "../../store/mixin.js"
-	import Poster from "./poster.vue"
+	import ShareOrder from "./shareOrder.vue"
 	export default {
 		components: {
-			Poster
+			ShareOrder
 		},
 		onLoad() {
 			this.initBackground("#000000")
@@ -190,17 +186,75 @@
 					}
 				})
 			},
-			handleUrlReady(e) {
-				console.log("handleUrlReady");
-				this.canvasImagePath = e
+			// 生成canvas图像
+			createCanvasImage() {
+				const ctx = uni.createCanvasContext('myCanvas');
+				// 在canvas上绘制一些内容
+				ctx.setFillStyle('red');
+				ctx.fillRect(10, 10, 150, 100);
+
+				// 加载图片资源
+				const image = 'https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/shareback.png'; // 确保图像路径正确
+				uni.getImageInfo({
+					src: image,
+					success: (res) => {
+						ctx.drawImage(res.path, 0, 0, 100, 100);
+						ctx.draw(false, () => {
+							uni.canvasToTempFilePath({
+								canvasId: 'myCanvas',
+								success: (res) => {
+									this.canvasImagePath = res.tempFilePath;
+								},
+								fail: (err) => {
+									console.log(err);
+								}
+							});
+						});
+					},
+					fail: (err) => {
+						console.log('图像加载失败:', err);
+					}
+				});
 			},
-			// 自定义分享方法
-			shareCanvasImage() {
-				if (this.canvasImagePath) {
-					console.log("this.canvasImagePath", this.canvasImagePath);
+			// 检查和请求权限
+			checkAndRequestPermission() {
+				uni.getSetting({
+					success: (res) => {
+						if (!res.authSetting['scope.writePhotosAlbum']) {
+							uni.authorize({
+								scope: 'scope.writePhotosAlbum',
+								success: () => {
+									console.log('权限授予成功');
+								},
+								fail: () => {
+									console.log('用户拒绝了权限请求');
+									// 用户拒绝权限请求后，进行相应处理，例如提示用户
+									uni.showModal({
+										title: '提示',
+										content: '需要授予保存到相册的权限，否则无法分享图片',
+										showCancel: false,
+										success: (modalRes) => {
+											if (modalRes.confirm) {
+												uni.openSetting({
+													success: (settingRes) => {
+														console.log(settingRes.authSetting);
+													}
+												});
+											}
+										}
+									});
+								}
+							});
+						}
+					}
+				});
+			},
+			handleShareReady(data) {
+				if (data) {
 					wx.showShareImageMenu({
-						path: this.canvasImagePath
+						path: data.url
 					})
+					console.log("data", data);
 				} else {
 					uni.showToast({
 						title: '请先生成图片',
@@ -209,14 +263,6 @@
 				}
 			}
 		},
-		// 分享功能
-		onShareAppMessage() {
-			return {
-				title: '分享标题',
-				path: '/pages/index/index', // 分享的路径，根据需要修改
-				imageUrl: this.canvasImagePath // 分享的图片路径
-			};
-		}
 	}
 </script>
 
@@ -346,7 +392,6 @@
 					font-size: 14px;
 				}
 
-				.arrow-tr-icon,
 				.close-icon {
 					width: 24rpx;
 					height: 24rpx;

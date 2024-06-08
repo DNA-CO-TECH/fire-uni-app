@@ -144,9 +144,9 @@
 					total: this.total,
 				});
 			},
-			handleScrolltolower(event) {
+			async handleScrolltolower(event) {
 				if (this.data.length < this.total) {
-					this.loadNextPage();
+					await this.loadNextPage();
 				}
 			},
 			async loadNextPage() {
@@ -174,11 +174,11 @@
 			onKeyInput: (event) => {
 				phoneNumber = event.detail.value;
 			},
-			handleSearch() {
+			async handleSearch() {
 				this.page = 1;
 				this.size = 6;
 				this.orderList = []
-				this.getOrders();
+				await this.getOrders();
 			},
 			async getOrders() {
 				const userInfo = getStorage("userInfo")
