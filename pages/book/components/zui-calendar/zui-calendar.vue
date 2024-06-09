@@ -55,7 +55,7 @@
 									</text>
 								</view>
 								<view v-if="item.isChosen" class="time-chosen frc-center">
-									<image style="width: 24rpx;height: 16rpx;" src="/static/book/right.svg"></image>
+									<image style="width: 24rpx;height: 16rpx;" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/book/right.svg"></image>
 								</view>
 							</view>
 						</view>
@@ -416,7 +416,7 @@
 	</script>
 
 	<style lang="scss" scoped>
-		@import "iconfont.css";
+		@import "./iconfont.css";
 
 		.date-box {
 			display: flex;

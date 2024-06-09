@@ -5,7 +5,7 @@
 			<!-- 胶囊区域 -->
 			<view class="capsule-box"
 				:style="`height:${navigationBarHeight}px; min-height:${navigationBarHeight}px; line-height:${navigationBarHeight}px; margin-top:${statusBarHeight}px;`">
-				<image class="nav-logo" src="/static/home/yan.png" @click="handleHome"></image>
+				<image class="nav-logo" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/home/yan-red.png" @click="handleHome"></image>
 				<view class="nav-title" style="flex:1; text-align: center">我的预订</view>
 			</view>
 		</view>
@@ -14,7 +14,7 @@
 			<view class="myorders-container fcc-start gap-20">
 				<view class="list-item-wrap mt-12" v-for="item in orderList" :key="item.id">
 					<view class="list-item-title">
-						<image class="logo" src="/static/home/yan.png" alt="logo" />
+						<image class="logo" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/home/yan-red.png" alt="logo" />
 					</view>
 					<view class="fcc-center mt-10">————————</view>
 					<view class="list-item-content">
@@ -47,7 +47,7 @@
 					</view>
 					<view class="list-item-operations w-full frc-between mt-32">
 						<view class="flex-1 text-left" @click="handleCancelOrder(item)">
-							<image src="/static/book/x.png" class="close-icon" />
+							<image src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/book/x.png" class="close-icon" />
 							<text>取消预订</text>
 						</view>
 						<ShareOrder :order="item" @onUrlReady="handleShareReady" />
@@ -168,7 +168,7 @@
 				return data
 			},
 			addNewOrder() {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '/pages/book/book',
 				})
 			},
@@ -328,7 +328,7 @@
 			height: 400px;
 			padding: 70rpx;
 			border-radius: 12rpx;
-			background-image: url(/static/book/order.png);
+			background-image: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/book/order.png');
 			background-size: cover;
 			background-repeat: no-repeat;
 

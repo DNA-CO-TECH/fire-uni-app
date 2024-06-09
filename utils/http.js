@@ -12,11 +12,12 @@ import {
 // 对类进行实例化
 const instance = ajax.create({
 	baseURL: env.baseURL,
-	timeout: 5000
+	timeout: 12000
 })
 
 // 添加请求拦截器 (在请求发送之前对请求参数进行新增或者修改)
 instance.interceptors.request.use((config) => {
+	console.log("http-config", config);
 	// 需要先从本地获取到存储的 token
 	const token = getStorage('token');
 
@@ -38,6 +39,8 @@ instance.interceptors.response.use((res, config) => {
 		statusCode,
 		data
 	} = res;
+	console.log("http-response-config", config);
+	console.log("http-response-res-data", data);
 	if (statusCode !== 200) {
 		uni.showToast({
 			title: "状态码：" + statusCode,
@@ -57,7 +60,6 @@ instance.interceptors.response.use((res, config) => {
 
 		case 200:
 			// 接口调用成功，服务器成功返回了数据，只需要将数据简化以后返回即可
-			console.log("data222", data)
 			return Promise.resolve(data)
 
 		case 208:

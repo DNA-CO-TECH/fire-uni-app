@@ -5,7 +5,8 @@
 			<!-- 胶囊区域 -->
 			<view class="capsule-box"
 				:style="`height:${navigationBarHeight}px; min-height:${navigationBarHeight}px; line-height:${navigationBarHeight}px; margin-top:${statusBarHeight}px;`">
-				<image class="nav-logo" src="/static/home/yan.png" @click="handleHome"></image>
+				<image class="nav-logo" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/home/yan-red.png"
+					@click="handleHome"></image>
 				<view class="nav-title" style="flex:1; text-align: center">餐厅预订</view>
 			</view>
 		</view>
@@ -43,7 +44,12 @@
 		},
 		onLoad() {
 			this.initBackground("#000000")
-			this.dateInfo = new Date().getTime()
+			this.dateInfo = format.getDayZeroTimestamp()
+			this.getOrdersByDate()
+		},
+		onShow() {
+			this.initBackground("#000000")
+			this.dateInfo = format.getDayZeroTimestamp()
 			this.getOrdersByDate()
 		},
 		mixins: [systemInfo],
@@ -83,7 +89,7 @@
 				desk1,
 				index
 			}) {
-				this.dateInfo = new Date(date).getTime()
+				this.dateInfo = format.getDayZeroTimestamp(date)
 				this.desksleft = this.time === 0 ? desk0 : desk1
 				this.activeDayDeskLeft = [desk0, desk1]
 			},
@@ -105,19 +111,17 @@
 				year,
 				month
 			}) {
-				this.getOrdersByDate(new Date(`${year}-${month}-${1}`).getTime())
+				this.getOrdersByDate(format.getDayZeroTimestamp(`${year}-${month}-${1}`))
 			},
 			lastMonth({
 				year,
 				month
 			}) {
 				const currentMonth = new Date().getMonth() + 1
-				console.log("currentMonth", currentMonth);
-				console.log("month", month);
 				if (currentMonth === month) {
-					this.getOrdersByDate(new Date(`${year}-${month}-${new Date().getDate()}`).getTime())
+					this.getOrdersByDate(format.getDayZeroTimestamp(`${year}-${month}-${new Date().getDate()}`))
 				} else if (currentMonth < month) {
-					this.getOrdersByDate(new Date(`${year}-${month}-${1}`).getTime())
+					this.getOrdersByDate(format.getDayZeroTimestamp(`${year}-${month}-${1}`))
 				}
 			},
 			nextStep() {
@@ -137,7 +141,7 @@
 				})
 			},
 			async getOrdersByDate(date) {
-				const currentTime = format.getTodayZeroTimestamp()
+				const currentTime = format.getDayZeroTimestamp()
 				this.loading = true
 				const res = await reqOrderInfo(date || currentTime);
 				if (res) {

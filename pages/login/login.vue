@@ -1,24 +1,26 @@
 <template>
 	<view class="login-container">
 		<view class="frc-start gap-12">
-			<image src="/static/manage/yan_circle.png" class="logo" />
+			<image src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/manage/yan_circle.png"
+				class="logo" />
 			<text>炎·薪火</text>
 		</view>
 		<view class="title-description">
 			<text>选择登陆身份</text>
 		</view>
-		<view class="w-full fcs-between gap-12">
+		<view class="w-full fcs-between gap-12" v-show="userInfo.userId">
 			<view class="role-item cursor-pointer bg-white frc-start gap-20 p-20" v-if="isAdmin" @click="handleAdmin"
 				style="border-radius: 12px;">
-				<image src="/static/manage/admin.png" class="avatar" />
+				<image src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/manage/admin.png"
+					class="avatar" />
 				<view class="fcs-between gap-8">
 					<text>管理员</text>
 					<text style="font-size: 12px;color:darkgray">管理员身份可以修改客户预约信息</text>
 				</view>
 			</view>
-			<view class="role-item cursor-pointer bg-white frc-start gap-20 p-20" @click="handleUser"
+			<view class="role-item cursor-pointer bg-white frc-start gap-20 p-20" @click="handleUser(userInfo.userId)"
 				style="border-radius: 12px;">
-				<image src="/static/manage/fork.png" class="avatar" />
+				<image src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/manage/fork.png" class="avatar" />
 				<view class="fcs-between gap-8">
 					<text>就餐客人</text>
 					<text style="font-size: 12px;color:darkgray">预约餐厅座位</text>
@@ -47,43 +49,53 @@
 	} from "../../store/mixin.js"
 	export default {
 		name: 'login',
-		async onLoad() {
+		onLoad() {
+			console.log("login-onLoad")
 			this.initBackground("#F2F2F2")
-			await this.handleLogin()
-			const info = getStorage("userInfo");
-			console.log("info", info);
-			if (info) {
-				this.isAdmin = info.isAdmin === 1
-				console.log("info.isAdmin", info.isAdmin);
-			}
+			this.handleLogin()
+		},
+		onShow() {
+			console.log("login-onShow")
+			this.initBackground("#F2F2F2")
 		},
 		mixins: [systemInfo],
 		data() {
 			return {
-				isAdmin: false
+				isAdmin: false,
+				userInfo: {}
 			}
 		},
 		methods: {
-			async handleLogin() {
+			handleLogin() {
+				const cache = getStorage("userInfo")
+				// 缓存有就不用请求
+				if (cache && cache.userId) {
+					console.log("login-handleLogin", cache)
+					return
+				}
+				console.log("login-handleLogin")
+				this.isHandleLogin = true
 				const that = this
 				// #ifdef MP-WEIXIN
-				await wx.login({
+				wx.login({
 					success: async (res) => {
 						const response = await reqLogin({
 							code: res.code,
 							username: null,
 							avatar: null,
 						});
+						console.log("login-reqLogin")
 						const token = response.data.token;
 						setStorage('token', token)
 						const data = await reqUserInfo();
+						console.log("login-reqUserInfo")
 						setStorage('userInfo', data.data)
-						console.log("data.data", data.data);
+
 						if (data.data) {
-							console.log("data.data.isAdmin", data.data.isAdmin);
-							that.isAdmin = data.data.isAdmin
+							this.userInfo = data.data
+							that.isAdmin = data.data.isAdmin === 1
 							if (!data.data.isAdmin) {
-								await that.handleUser()
+								await that.handleUser(data.data.userId)
 							}
 						}
 					},
@@ -92,6 +104,7 @@
 					},
 					complete(e) {
 						console.log("complete", e);
+						this.isHandleLogin = false
 					}
 				})
 				// #endif
@@ -103,8 +116,9 @@
 				setStorage('userInfo', data.data)
 				this.isAdmin = data.data.isAdmin
 				if (!data.data.isAdmin) {
-					await this.handleUser()
+					await this.handleUser(data.data.userId)
 				}
+				this.isHandleLogin = false
 				// #endif
 			},
 			handleAdmin() {
@@ -112,21 +126,26 @@
 					url: "/pages/manage/manage",
 				})
 			},
-			async handleUser() {
-				const userInfo = getStorage("userInfo")
-				const data = await getOrderList({
-					count: 6,
-					page: 1,
-					userId: userInfo?.userId
-				})
-				if (data?.last_page && data.last_page > 0) {
-					uni.navigateTo({
-						url: "/pages/myorders/myorders",
+			async handleUser(_userId) {
+				console.log("login-handleUser");
+				if (_userId) {
+					const data = await getOrderList({
+						count: 6,
+						page: 1,
+						userId: _userId
 					})
+					console.log("login-getOrderList");
+					if (data && data.last_page && data.last_page > 0) {
+						uni.navigateTo({
+							url: "/pages/myorders/myorders",
+						})
+					} else {
+						uni.navigateTo({
+							url: "/pages/book/book",
+						})
+					}
 				} else {
-					uni.navigateTo({
-						url: "/pages/book/book",
-					})
+					console.log("userId none");
 				}
 			}
 		}
