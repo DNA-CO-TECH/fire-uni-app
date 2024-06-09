@@ -142,10 +142,23 @@
 				<button class="flex-1 next-step" style="color:#000000" @click="clear">清空选择</button>
 				<button class="flex-1 next-step next-step-black" @click="save">保存修改</button>
 			</view>
-			<view class="frc-center" style="height: 172rpx" v-else>
-				<input :class="{'phone':true,'phone-empty':phoneNumberEmpty}" name="input" placeholder="请输入预约人手机号"
-					@input="onKeyInput" />
-				<button class="next-step" @click="confirm">立即预订</button>
+			<view class="w-full" v-else>
+				<view class="fcc-center relative">
+					<view :class="{'frc-center':true, 'phone-wrap':true, 'phone-empty':phoneNumberError}">
+						<text style="color:gray">+86</text>
+						<input class="phone" name="input" placeholder="请输入预约人手机号" @input="onKeyInput" />
+					</view>
+					<view v-show="phoneNumberError" class="field-error">请检查您输入的手机号</view>
+				</view>
+				<view class="frc-between submit-wrap">
+					<view class="frc-center">
+						<view class="icon-wrap frc-center">
+							<image src="/static/book/right.svg" style="width: 12px;height: 12px;" />
+						</view>
+						<text style="color:gray">已选择 {{peopleCount}} 位就餐</text>
+					</view>
+					<button class="next-step" @click="confirm">立即预订</button>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -185,7 +198,7 @@
 				tableStatus: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // 0代表已经被别人预订，1代表可以预订，吧台椅子视为桌子，后八个元素都是代表吧台座位
 				myBookTableIds: [], // 选中的桌子
 				myBookSeatsIds: [], // 选中的椅子
-				phoneNumberEmpty: false,
+				phoneNumberError: false,
 				phoneNumber: null,
 				isEdit: false
 			}
@@ -207,6 +220,9 @@
 					}
 				}
 				return availableBarSeats;
+			},
+			peopleCount() {
+				return this.myBookSeatsIds.length + this.myBookTableIds.filter(tableId => tableId > 2).length
 			}
 		},
 		methods: {
@@ -233,7 +249,11 @@
 			},
 			onKeyInput: function(event) {
 				this.phoneNumber = event.detail.value;
-				this.phoneNumberEmpty = false
+				this.phoneNumberError = false
+			},
+			validatePhoneNumber(phoneNumber) {
+				const phoneRegEx = /^1[3456789]\d{9}$/;
+				return phoneRegEx.test(phoneNumber);
 			},
 			async confirm() {
 				if (this.myBookTableIds.length === 0) {
@@ -241,8 +261,8 @@
 						title: "提交失败",
 						content: "请至少预订一个座位"
 					})
-				} else if (!this.phoneNumber) {
-					this.phoneNumberEmpty = true
+				} else if (!this.phoneNumber || !this.validatePhoneNumber(this.phoneNumber)) {
+					this.phoneNumberError = true
 				} else {
 					const response = await postOrderInfo({
 						"desk": this.myBookTableIds.map(id => id + 1),
@@ -388,15 +408,14 @@
 	}
 
 	.book-container {
-		margin-top: 160rpx;
-		height: calc(100% - 160rpx);
+		margin-top: 128rpx;
+		min-height: calc(100% - 128rpx);
 	}
 
 	.book-container {
 		display: flex;
 		flex-direction: column;
 		position: relative;
-		padding: 0rpx 10rpx 20rpx 10rpx;
 
 		.back-image {
 			position: absolute;
@@ -407,33 +426,57 @@
 			height: 100%;
 		}
 
+		.phone-wrap {
+			width: calc(100% - 64px);
+			margin: 24px 32px;
+			height: 80rpx;
+			border-radius: 16rpx;
+			background-color: #22262d;
+		}
+
+		.submit-wrap {
+			width: calc(100% - 48px);
+			padding: 0px 24px;
+			height: 160rpx;
+			background-color: #22262d;
+			margin-top: 10px;
+		}
+
 		.phone {
 			color: #C8CACE;
 			height: 70rpx;
 			border-right: none;
 			border-left: 1px solid;
-			border-top: 1px solid;
-			border-bottom: 1px solid;
 			border-color: #423A38;
-			border-top-left-radius: 12rpx;
-			border-bottom-left-radius: 12rpx;
 			padding-left: 24rpx;
 			font-size: 28rpx;
+			margin-left: 40px;
 		}
 
 		.phone-empty {
-			border-color: #EE692C;
+			border: 1px solid #EE692C;
+		}
+
+		.field-error {
+			color: #EE692C;
+			text-align: left;
+			font-size: 24rpx;
+			position: absolute;
+			left: 140px;
+			bottom: 0px;
 		}
 
 		.next-step {
 			width: 200rpx;
 			height: 70rpx;
+			margin: 0;
 			color: white;
 			background-color: #EE692C;
 			font-size: 28rpx;
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			border-radius: 10px;
 		}
 
 		.next-step-black {
@@ -651,5 +694,13 @@
 			border-bottom-right-radius: 50%;
 			border-top: 0px !important;
 		}
+	}
+
+	.icon-wrap {
+		width: 20px;
+		height: 20px;
+		margin: 0 8px 0px 0;
+		background-color: #ee692c;
+		border-radius: 10px;
 	}
 </style>

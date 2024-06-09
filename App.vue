@@ -120,6 +120,10 @@
 		position: relative;
 	}
 
+	.hidden {
+		visibility: hidden;
+	}
+
 	.absolute {
 		position: absolute;
 	}

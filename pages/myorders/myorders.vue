@@ -8,7 +8,6 @@
 				<image class="nav-logo" src="/static/home/yan.png" @click="handleHome"></image>
 				<view class="nav-title" style="flex:1; text-align: center">我的预订</view>
 			</view>
-			<text class="logo-slogan">燃烧另一种意义</text>
 		</view>
 		<data-list :page="page" :size="size" emptyText="~ 我是有底线的 ~" @load="handleLoad" @refresh="handleRefresh"
 			@scrollTolower="handleScrolltolower">
@@ -85,7 +84,6 @@
 		},
 		onLoad() {
 			this.initBackground("#000000")
-			this.initMyOrders()
 		},
 		mixins: [systemInfo],
 		data() {
@@ -111,9 +109,9 @@
 					total: this.total,
 				});
 			},
-			handleScrolltolower(event) {
+			async handleScrolltolower(event) {
 				if (this.data.length < this.total) {
-					this.loadNextPage();
+					await this.loadNextPage();
 				}
 			},
 			async loadNextPage() {
@@ -122,12 +120,15 @@
 				this.page = currentPage;
 				this.size = pageSize;
 				const data = await this.initMyOrders()
-				this.data = data.data;
+				this.data = this.data.concat(data.data);
 				this.total = data.last_page;
-				this.list = this.list.concat(data);
 				this.total = this.total;
 			},
 			async handleLoad(params, callback) {
+				if (this.orderList.length >= this.total) {
+					console.log("handleLoad");
+					return false
+				}
 				this.page = params.page;
 				this.size = params.size;
 				const data = await this.initMyOrders()
@@ -151,8 +152,8 @@
 				});
 			},
 			handleHome() {
-				uni.navigateTo({
-					url: '/pages/index/index',
+				uni.navigateBack({
+					delta: 10
 				})
 			},
 			async initMyOrders() {
@@ -171,12 +172,6 @@
 					url: '/pages/book/book',
 				})
 			},
-			// handleEditOrder() {
-			// 	console.log("缓存此数据，打开book页面初始化")
-			// 	uni.navigateTo({
-			// 		url: '/pages/book/book'
-			// 	})
-			// },
 			async handleCancelOrder(item) {
 				await deleteOrder(item.orderId)
 				uni.showToast({
@@ -322,8 +317,8 @@
 		display: flex;
 		flex-direction: column;
 		position: relative;
-		margin-top: 200rpx;
-		height: calc(100% - 200rpx);
+		margin-top: 128rpx;
+		height: calc(100% - 128rpx);
 		padding: 0px 36px 20px 36px;
 		overflow: auto;
 
@@ -406,9 +401,9 @@
 		left: 0px;
 		right: 0px;
 		width: 100vw;
-		height: 80px;
+		height: 200rpx;
 		z-index: 1111;
-		background: linear-gradient(to bottom, #13141544 0%, #bb682B 70%, #ED682B 100%);
+		background: #131415;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -418,15 +413,16 @@
 			justify-content: center;
 			align-items: center;
 			cursor: pointer;
-			border: 1px solid transparent;
+			border: 1px solid #F06627;
 			box-sizing: border-box;
 			width: 90%;
-			margin-top: 20px;
+			margin-top: 10px;
+			margin-bottom: 20px;
 
 			text {
 				padding: 10px;
 				text-align: center;
-				color: #ffffff;
+				color: #F06627;
 			}
 		}
 	}

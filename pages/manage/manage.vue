@@ -11,7 +11,7 @@
 		<view class="search-bar" :style="`padding-top:${navHeight+20}px;`">
 			<!-- 查询框（左侧有放大镜图标） -->
 			<view class="search-input">
-				<input style="font-size: 14px;" type="text" placeholder="通过手机号搜索" @input="onKeyInput" />
+				<input style="font-size: 14px;" type="text" placeholder="通过手机号搜索" @confirm="handleSearch" @input="onKeyInput" />
 				<icon class="iconfont icon-search" type="search" size="14" @click.stop="handleSearch"></icon>
 			</view>
 			<!-- 新增预订按钮（左侧有+号） -->
@@ -31,7 +31,9 @@
 						<!-- 时间段 -->
 						<view class="item-time">{{ item.timeInfo===0?'17:30~18:30':'19:00 ~20:00' }}</view>
 						<!-- 共x位客人 -->
-						<view class="item-guests">共{{ item.orders.length }}位客人</view>
+						<view class="item-guests">
+							共{{ item.orders.map(o=>o.people).reduce((accumulator, currentValue) => accumulator + currentValue, 0) }}位客人
+						</view>
 					</view>
 					<view class="order-list fcc-start gap-12">
 						<view v-for="(order, index) in item.orders" :key="index" :index="index" class="order-item">
@@ -64,6 +66,7 @@
 </template>
 
 <script>
+	import DataList from "/components/data-list/data-list.vue"
 	import {
 		debounce
 	} from "radash"
@@ -81,6 +84,9 @@
 	} from "../../store/mixin.js"
 	let phoneNumber = null
 	export default {
+		components: {
+			DataList
+		},
 		onShow() {
 			this.initBackground("#F2F2F2")
 			this.getSystemInfo()
@@ -155,12 +161,16 @@
 				this.page = currentPage;
 				this.size = pageSize;
 				const data = await this.getOrders()
-				this.data = data.data;
+				this.data = this.data.concat(data.data);
 				this.total = data.last_page;
-				this.list = this.list.concat(data);
 				this.total = this.total;
 			},
 			async handleLoad(params, callback) {
+				const dataLenth = this.orderList.map(o => o.orders.length).reduce((accumulator, currentValue) => accumulator +
+					currentValue, 0)
+				if (dataLenth >= this.total) {
+					return false
+				}
 				this.page = params.page;
 				this.size = params.size;
 				const data = await this.getOrders()
@@ -200,7 +210,9 @@
 				// Group orders by date and time
 				ordersData.forEach(order => {
 					let existingDateItem = orderList.find(item =>
-						item.dateInfo === ordersData.dateInfo && item.timeInfo === ordersData.timeInfo);
+						new Date(item.dateInfo).getMonth() === new Date(order.dateInfo).getMonth() &&
+						new Date(item.dateInfo).getDate() === new Date(order.dateInfo).getDate() && item.timeInfo ===
+						order.timeInfo);
 					if (!existingDateItem) {
 						existingDateItem = {
 							dateInfo: order.dateInfo,
@@ -257,21 +269,21 @@
 				// console.log("item", item);
 				uni.showModal({
 					title: "是否取消以下预订",
-					content: `${item.date} ${item.time} ${detail.people}位就餐\r\n桌号： ${detail.desk}\r\n订餐手机号： ${detail.phone}
-					`,
-					success: async () => {
-						console.log("detail.orderId", detail.orderId);
-						await deleteOrder(detail.orderId)
-						await this.getOrders()
-					},
-					cancelText: "取消"
+					cancelText: "取消",
+					content: `${new Date(item.dateInfo).getMonth()+1}月${new Date(item.dateInfo).getDate()}日 ${item.timeInfo===0?'17:30~18:30':'19:00 ~20:00'} ${detail.people}位就餐\r\n桌号： ${detail.desk}\r\n订餐手机号： ${detail.phone}`,
+					success: async (event) => {
+						if (event.confirm) {
+							await deleteOrder(detail.orderId)
+							uni.redirectTo({
+								url: '/pages/manage/manage'
+							})
+						}
+					}
 				})
 			},
 			// 切换角色
 			handleSwitch() {
-				uni.navigateTo({
-					url: '/pages/login/login',
-				})
+				uni.navigateBack()
 			},
 			// 复制手机号
 			copyPhone(phone) {

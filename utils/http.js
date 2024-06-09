@@ -12,7 +12,7 @@ import {
 // 对类进行实例化
 const instance = ajax.create({
 	baseURL: env.baseURL,
-	timeout: 15000
+	timeout: 5000
 })
 
 // 添加请求拦截器 (在请求发送之前对请求参数进行新增或者修改)

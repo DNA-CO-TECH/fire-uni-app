@@ -42,13 +42,7 @@
 			ZuiCalendar,
 		},
 		onLoad() {
-			// #ifdef MP-WEIXIN
-			uni.setBackgroundColor({
-				backgroundColor: "#000000"
-			})
-			// #endif
-			this.getSystemInfo()
-
+			this.initBackground("#000000")
 			this.dateInfo = new Date().getTime()
 			this.getOrdersByDate()
 		},
@@ -78,9 +72,7 @@
 		methods: {
 			...mapMutations(['setBookInfo', 'setDesksLeft']),
 			handleHome() {
-				uni.navigateTo({
-					url: '/pages/index/index',
-				})
+				uni.navigateBack()
 			},
 			// 点击日数方法
 			clickActiveDay({
@@ -171,6 +163,7 @@
 		width: 40rpx;
 		height: 48rpx;
 		margin-top: 8rpx;
+		position: absolute;
 	}
 
 	.nav-title {

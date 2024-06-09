@@ -1,12 +1,12 @@
 <template>
 	<view class="root">
-		<view class="home-content">
+		<view class="home-content" @click="handleClick">
 			<image class="back-image" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/superfire.webp" />
 			<image class="logo" :fade-show="true" mode="widthFix" src="/static/home/yan.png" />
-			<view :class="`book ${animate?'text-animation':''}`" @click="handleClick">
+			<view :class="`${animate?'book text-animation':'hidden'}`">
 				<view class="button-wrap">
-					<view class="button" style="z-index: 1;">欢迎预订</view>
-					<image class="image" :fade-show="true" mode="widthFix" src="/static/home/arrow-down.png" />
+					<view class="button" style="width:18px;z-index: 1;">预订</view>
+					<image class="image" :fade-show="true" mode="widthFix" src="/static/home/arrow-down.svg" />
 				</view>
 			</view>
 		</view>
@@ -51,7 +51,9 @@
 		},
 		onShow() {
 			this.innerAudioContext.play()
-			this.animate = true
+			setTimeout(() => {
+				this.animate = true
+			}, 2000)
 		},
 		methods: {
 			async handleClick() {
@@ -114,11 +116,11 @@
 
 	.home-content .image {
 		width: 16px;
-		transform: rotate(-90deg);
 	}
 
 	.home-content .button-wrap {
 		display: flex;
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		gap: 10px;
@@ -138,7 +140,7 @@
 	@keyframes text-animation {
 		from {
 			opacity: 0;
-			transform: translateX(-50px);
+			transform: translateY(-80px);
 		}
 
 		to {

@@ -47,9 +47,9 @@
 	} from "../../store/mixin.js"
 	export default {
 		name: 'login',
-		onLoad() {
+		async onLoad() {
 			this.initBackground("#F2F2F2")
-			this.handleLogin()
+			await this.handleLogin()
 			const info = getStorage("userInfo");
 			console.log("info", info);
 			if (info) {
@@ -65,6 +65,7 @@
 		},
 		methods: {
 			async handleLogin() {
+				const that = this
 				// #ifdef MP-WEIXIN
 				await wx.login({
 					success: async (res) => {
@@ -77,9 +78,13 @@
 						setStorage('token', token)
 						const data = await reqUserInfo();
 						setStorage('userInfo', data.data)
-						this.isAdmin = data.data.isAdmin
-						if (!data.data.isAdmin) {
-							this.handleUser()
+						console.log("data.data", data.data);
+						if (data.data) {
+							console.log("data.data.isAdmin", data.data.isAdmin);
+							that.isAdmin = data.data.isAdmin
+							if (!data.data.isAdmin) {
+								await that.handleUser()
+							}
 						}
 					},
 					fail(e) {
@@ -98,7 +103,7 @@
 				setStorage('userInfo', data.data)
 				this.isAdmin = data.data.isAdmin
 				if (!data.data.isAdmin) {
-					this.handleUser()
+					await this.handleUser()
 				}
 				// #endif
 			},
@@ -114,7 +119,7 @@
 					page: 1,
 					userId: userInfo?.userId
 				})
-				if (data?.total && data.total > 0) {
+				if (data?.last_page && data.last_page > 0) {
 					uni.navigateTo({
 						url: "/pages/myorders/myorders",
 					})

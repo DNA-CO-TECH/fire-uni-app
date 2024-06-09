@@ -152,16 +152,12 @@
 					content: '提交成功',
 					showCancel: false,
 					success: () => {
-						uni.navigateTo({
-							url: "/pages/manage/manage"
-						})
+						uni.navigateBack()
 					}
 				});
 			},
 			handleBack() {
-				uni.navigateTo({
-					url: "/pages/manage/manage"
-				})
+				uni.navigateBack()
 			},
 			handleEditSeat() {
 				setStorage("orderDetail", this.formData)

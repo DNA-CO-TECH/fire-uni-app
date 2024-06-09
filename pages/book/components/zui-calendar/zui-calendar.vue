@@ -49,7 +49,11 @@
 						<view class="period-description">请选择就餐时间段</view>
 						<view class="period-box">
 							<view v-for="(item, index) in list" :key="index" class="period-item" @click="toPeriod(item, index)">
-								<view class="time"><text>{{item.time===0?'17:30~18:30':'19:00 ~20:00'}}</text></view>
+								<view :class="`${item.isChosen?'time time-chosed':'time'}`">
+									<text>
+										{{item.time===0?'17:30~18:30':'19:00 ~20:00'}}
+									</text>
+								</view>
 								<view v-if="item.isChosen" class="time-chosen frc-center">
 									<image style="width: 24rpx;height: 16rpx;" src="/static/book/right.svg"></image>
 								</view>
@@ -629,6 +633,7 @@
 					justify-content: center;
 					background-color: transparent;
 					padding: 20rpx;
+					height: 56px;
 					box-sizing: border-box;
 					border-radius: 16rpx;
 					background-color: #22262D;
@@ -650,6 +655,10 @@
 						background: #F06627;
 						border-top-left-radius: 16rpx;
 						border-bottom-right-radius: 16rpx;
+					}
+
+					.time-chosed {
+						color: #F06627;
 					}
 				}
 			}
