@@ -261,8 +261,9 @@
 			drawTextInfo(text, x, y, fontSize, color, width, height, lineHeight, bold, ellipsis) {
 				return new Promise(async (resolve, reject) => {
 					this.context.setFillStyle(color)
-					if (bold) this.context.font = 'bold ' + fontSize + 'px Arial'
-					else this.context.font = fontSize + 'px Arial'
+					if (bold) {
+						this.context.font = 'bold ' + fontSize + 'px Arial'
+					}
 					this.context.setTextBaseline('bottom')
 					let textArray = text.split('')
 					let line = ''

@@ -1,0 +1,50 @@
+/* .ali-font-thin {
+	font-family: "alipuhui";
+	font-weight: 100;
+	src: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/AlibabaPuHuiTi-2-35-Thin.ttf');
+}
+
+.ali-font-light {
+	font-family: "alipuhui";
+	font-weight: 300;
+	src: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/AlibabaPuHuiTi-2-45-Light.ttf');
+}
+
+.ali-font-regular {
+	font-family: "alipuhui";
+	font-weight: 400;
+	src: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/AlibabaPuHuiTi-2-55-Regular.ttf');
+}
+
+.ali-font-medium {
+	font-family: "alipuhui";
+	font-weight: 500;
+	src: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/AlibabaPuHuiTi-2-65-Medium.ttf');
+}
+
+.ali-font-bold {
+	font-family: "alipuhui";
+	font-weight: 700;
+	src: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/AlibabaPuHuiTi-2-85-Bold.ttf');
+} */
+
+
+@font-face {
+	font-family: "alipuhui-thin";
+	src: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/AlibabaPuHuiTi-2-35-Thin.ttf'),
+}
+
+@font-face {
+	font-family: "alipuhui-light";
+	src: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/AlibabaPuHuiTi-2-45-Light.ttf'),
+}
+
+@font-face {
+	font-family: "alipuhui-regular";
+	src: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/AlibabaPuHuiTi-2-55-Regular.ttf'),
+}
+
+@font-face {
+	font-family: "alipuhui-medium";
+	src: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/AlibabaPuHuiTi-2-65-Medium.ttf'),
+}

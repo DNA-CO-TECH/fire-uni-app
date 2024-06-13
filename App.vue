@@ -120,6 +120,10 @@
 		position: relative;
 	}
 
+	.display-none {
+		display: none;
+	}
+
 	.hidden {
 		visibility: hidden;
 	}
@@ -128,8 +132,16 @@
 		position: absolute;
 	}
 
+	.fixed {
+		position: fixed;
+	}
+
 	.top-0 {
 		top: 0
+	}
+
+	.bottom-0 {
+		bottom: 0
 	}
 
 	.left-0 {
@@ -198,19 +210,27 @@
 		background-color: white;
 	}
 
-	.p-20 {
-		padding: 24rpx;
+	.p-40 {
+		padding: 40rpx;
 	}
 
 	.gap-8 {
 		gap: 16rpx;
 	}
 
-	.gap-12 {
+	.gap-20 {
+		gap: 20rpx;
+	}
+
+	.gap-24 {
 		gap: 24rpx;
 	}
 
-	.gap-20 {
+	.gap-16 {
+		gap: 16rpx;
+	}
+
+	.gap-40 {
 		gap: 40rpx;
 	}
 

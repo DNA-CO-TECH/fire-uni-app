@@ -5,49 +5,58 @@
 			<!-- 胶囊区域 -->
 			<view class="capsule-box"
 				:style="`height:${navigationBarHeight}px; min-height:${navigationBarHeight}px; line-height:${navigationBarHeight}px; margin-top:${statusBarHeight}px;`">
-				<image class="nav-logo" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/home/yan-red.png" @click="handleHome"></image>
+				<image class="nav-logo" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/home/yan_red.png"
+					@click="handleHome"></image>
 				<view class="nav-title" style="flex:1; text-align: center">我的预订</view>
 			</view>
 		</view>
 		<data-list :page="page" :size="size" emptyText="~ 我是有底线的 ~" @load="handleLoad" @refresh="handleRefresh"
 			@scrollTolower="handleScrolltolower">
-			<view class="myorders-container fcc-start gap-20">
-				<view class="list-item-wrap mt-12" v-for="item in orderList" :key="item.id">
+			<view class="myorders-container fcc-start gap-40" :style="{
+				'margin-top':'160rpx',
+				'padding':'0rpx 72rpx 40rpx 72rpx',
+				'height': 'calc(100% - 328rpx)'
+			}">
+				<view class="list-item-wrap" v-for="(item,index) in orderList" :key="item.id"
+					:style="{'margin-bottom':index===orderList.length-1?'200rpx':'unset','margin-top':index===0?'40rpx':'unset'}">
 					<view class="list-item-title">
-						<image class="logo" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/home/yan-red.png" alt="logo" />
+						<image class="logo" src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/home/yan_red.png"
+							alt="logo" />
 					</view>
-					<view class="fcc-center mt-10">————————</view>
+					<view class="fcc-center mt-10" style="color:#ee692c;margin-top:28px;margin-bottom:28px">——</view>
 					<view class="list-item-content">
 						<view>
 							<text class="content-title">预约信息</text>
 						</view>
 						<view class="mb-20">
-							<text>{{new Date(item.dateInfo).getMonth()+1}}月{{new Date(item.dateInfo).getDate()}}日
+							<text
+								class="content-small">{{new Date(item.dateInfo).getMonth()+1}}月{{new Date(item.dateInfo).getDate()}}日
 								{{item.timeInfo===0?'17:30~18:30':'19:00 ~20:00'}}</text>
 						</view>
 						<view>
 							<text class="content-title">取消规则</text>
 						</view>
 						<view class="mb-20">
-							<text>30分钟内未到场，预订将自动取消</text>
+							<text class="content-small">30分钟内未到场，预订将自动取消</text>
 						</view>
 						<view>
 							<text class="content-title">餐厅地址</text>
 						</view>
 						<view class="mb-20">
-							<text>浙江省安吉县溪龙乡树下小白屋</text>
+							<text class="content-small">浙江省安吉县溪龙乡树下小白屋</text>
 						</view>
 						<view>
 							<text class="content-title">餐厅联系方式</text>
 						</view>
 						<view class="frc-center">
-							<text>17606988669</text>
-							<button class="copy" @click.stop="copyPhone(17606988669)">复制</button>
+							<text class="content-small">17606988669</text>
+							<button class="copy content-small" @click.stop="copyPhone(17606988669)">复制</button>
 						</view>
 					</view>
 					<view class="list-item-operations w-full frc-between mt-32">
 						<view class="flex-1 text-left" @click="handleCancelOrder(item)">
-							<image src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/book/x.png" class="close-icon" />
+							<image src="https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/book/x.png"
+								class="close-icon" />
 							<text>取消预订</text>
 						</view>
 						<ShareOrder :order="item" @onUrlReady="handleShareReady" />
@@ -102,12 +111,17 @@
 				this.page = 1;
 				this.size = 6;
 				const data = await this.initMyOrders()
-				this.data = data.data;
-				this.total = data.last_page;
-				callback({
-					list: this.data,
-					total: this.total,
-				});
+				if (data) {
+					this.data = data.data;
+					this.total = data.last_page;
+					if (data.last_page === 0) {
+						this.addNewOrder()
+					}
+					callback({
+						list: this.data,
+						total: this.total,
+					});
+				}
 			},
 			async handleScrolltolower(event) {
 				if (this.data.length < this.total) {
@@ -120,9 +134,14 @@
 				this.page = currentPage;
 				this.size = pageSize;
 				const data = await this.initMyOrders()
-				this.data = this.data.concat(data.data);
-				this.total = data.last_page;
-				this.total = this.total;
+				if (data) {
+					this.data = this.data.concat(data.data);
+					this.total = data.last_page;
+					this.total = this.total;
+					if (data.last_page === 0) {
+						this.addNewOrder()
+					}
+				}
 			},
 			async handleLoad(params, callback) {
 				if (this.orderList.length >= this.total) {
@@ -131,13 +150,23 @@
 				}
 				this.page = params.page;
 				this.size = params.size;
+				uni.showLoading({
+					title: "加载中"
+				})
 				const data = await this.initMyOrders()
-				this.data = data.data;
-				this.total = data.last_page;
-				callback({
-					list: this.data,
-					total: this.total,
-				});
+				console.log("data", data);
+				if (data) {
+					this.data = data.data;
+					this.total = data.last_page;
+					if (data.last_page === 0) {
+						this.addNewOrder()
+					}
+					callback({
+						list: this.data,
+						total: this.total,
+					});
+				}
+				uni.hideLoading()
 			},
 			// 复制手机号
 			copyPhone(phone) {
@@ -152,16 +181,41 @@
 				});
 			},
 			handleHome() {
-				uni.navigateBack({
-					delta: 10
-				})
+				let userInfo = getStorage("userInfo")
+				// #ifdef MP-WEIXIN
+				if (!userInfo.userId) {
+					return
+				}
+				// #endif
+				// #ifdef H5
+				userInfo = JSON.parse(userInfo)
+				if (!userInfo.userId) {
+					return
+				}
+				// #endif
+				if (userInfo.isAdmin) {
+					uni.redirectTo({
+						url: '/pages/login/login'
+					})
+				}
 			},
 			async initMyOrders() {
-				const userInfo = getStorage("userInfo")
+				let userInfo = getStorage("userInfo")
+				// #ifdef MP-WEIXIN
+				if (!userInfo.userId) {
+					return
+				}
+				// #endif
+				// #ifdef H5
+				userInfo = JSON.parse(userInfo)
+				if (!userInfo.userId) {
+					return
+				}
+				// #endif
 				const params = {
 					count: this.size,
 					page: this.page,
-					userId: userInfo?.userId
+					userId: userInfo.userId
 				}
 				const data = await getOrderList(params)
 				this.orderList = this.orderList.concat(data.data)
@@ -173,11 +227,17 @@
 				})
 			},
 			async handleCancelOrder(item) {
-				await deleteOrder(item.orderId)
-				uni.showToast({
-					title: "取消成功",
-					success: () => {
-						this.orderList = this.orderList.filter(order => order.orderId !== item.orderId)
+				uni.showModal({
+					title: "是否取消以下预订",
+					cancelText: "取消",
+					content: `${new Date(item.dateInfo).getMonth() + 1}月${new Date(item.dateInfo).getDate()}日 ${item.timeInfo === 0 ? '17:30~18:30' : '19:00 ~20:00'} ${item.people}位就餐\r\n桌号： ${item.desk}\r\n订餐手机号： ${item.phoneNumber}`,
+					success: async (event) => {
+						if (event.confirm) {
+							await deleteOrder(item.orderId)
+							uni.redirectTo({
+								url: '/pages/myorders/myorders'
+							})
+						}
 					}
 				})
 			},
@@ -299,6 +359,7 @@
 				height: 48rpx;
 				margin-top: 8rpx;
 				cursor: pointer;
+				position: absolute;
 			}
 
 			.nav-title {
@@ -317,15 +378,12 @@
 		display: flex;
 		flex-direction: column;
 		position: relative;
-		margin-top: 128rpx;
-		height: calc(100% - 128rpx);
-		padding: 0px 36px 20px 36px;
 		overflow: auto;
 
 		.list-item-wrap {
 			z-index: 1;
 			width: calc(100% - 140rpx);
-			height: 400px;
+			height: 880rpx;
 			padding: 70rpx;
 			border-radius: 12rpx;
 			background-image: url('https://dnamini-1316443200.cos.ap-shanghai.myqcloud.com/yanstatic/book/order.png');
@@ -334,17 +392,21 @@
 
 			.content-title {
 				font-size: 32rpx;
-				font-weight: 700;
-				color: #C4C6CA;
+				font-weight: 600;
+				color: #C4C6CACC;
 				text-align: center;
 				margin-bottom: 12rpx;
 				display: block;
 			}
 
+			.content-small {
+				color: #C4C6CACC;
+			}
+
 			.list-item-title {
 				font-size: 32rpx;
 				font-weight: 700;
-				color: #C4C6CA;
+				color: #C4C6CACC;
 				text-align: center;
 				padding-top: 20rpx;
 
@@ -357,13 +419,15 @@
 			.list-item-content {
 				width: 100%;
 				font-size: 28rpx;
+				font-weight: 100;
 				color: #C4C6CA;
 				text-align: center;
 
 				.copy {
 					width: 100rpx;
 					font-size: 24rpx;
-					border: 1px solid #E7E7E7;
+					color: #C4C6CACC;
+					border: 1px solid #C4C6CACC;
 					padding: 6rpx 10rpx;
 					margin: 0px;
 					margin-left: 20rpx;
@@ -415,7 +479,7 @@
 			cursor: pointer;
 			border: 1px solid #F06627;
 			box-sizing: border-box;
-			width: 90%;
+			width: calc(100% - 144rpx);
 			margin-top: 10px;
 			margin-bottom: 20px;
 

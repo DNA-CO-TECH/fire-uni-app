@@ -159,6 +159,7 @@
 		},
 		mounted() {
 			this.handleInit();
+			console.log("data-list-mounted");
 		},
 		methods: {
 			// 数据加载
@@ -168,6 +169,7 @@
 					page: this.currentPage,
 					size: this.currentSize
 				}, res => {
+					console.log("data-list-loadData");
 					this.waiting = false;
 					this.loadingMask = false;
 					this.list = res.list;
@@ -216,9 +218,12 @@
 				if (this.autoLoad && this.loadStatus != 'nomore') {
 					const components = await this.getRect('.data-list-components');
 					const scrolList = await this.getRect('.scroll-list');
+					console.log("scrolList.height", scrolList.height);
+					console.log("components.height", components.height);
 					if (scrolList.height <= components.height) {
 						this.loadData();
 					} else {
+						this.loadData(); // 初始无论如何加载一次
 						this.autoLoad = false;
 					}
 				}
